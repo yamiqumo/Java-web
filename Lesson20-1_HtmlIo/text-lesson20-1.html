@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>第20回：HTML基礎（I/O前半）〜フォームとテーブルで「入れる」「出す」をつかむ〜</title>
+</head>
+<body>
+  <div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+    <h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+      第20回：HTML基礎（I/O前半）〜フォームとテーブルで「入れる」「出す」をつかむ〜
+    </h1>
+
+    <!-- 1. 復習 -->
+    <section style="margin-bottom: 30px;">
+      <h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+        1. 復習：これまでの「入出力」とこれからの「画面I/O」
+      </h2>
+
+      <div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+        <div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+          <p style="margin-bottom: 10px;">これまでの自販機プログラムでは、次のような <strong>入出力（I/O）</strong> を扱ってきました。</p>
+          <ul style="padding-left: 20px; margin-bottom: 0;">
+            <li style="margin-bottom: 10px;"><strong>入力</strong>：コンソールから <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Scanner</code> で数字や文字列を読む</li>
+            <li style="margin-bottom: 10px;"><strong>処理</strong>：Java の変数やメソッドで在庫・金額を計算する</li>
+            <li style="margin-bottom: 10px;"><strong>出力</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">System.out.println</code> でメッセージを表示する</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="margin-top: 15px;">
+        <div style="background-color: #f2f2f2; padding: 15px; border-radius: 5px; border-left: 5px solid #888888; margin-bottom: 10px;">
+          <p style="margin: 0;"><strong>カバ先生</strong>：「今までは <strong>コンソール → Java → コンソール</strong> という世界でした。これからは、<strong>ブラウザの画面 → サーバ側のJava → 画面に戻す</strong> という新しい『通り道』を作っていきます。」</p>
+        </div>
+        <div style="background-color: #e6f4ff; padding: 15px; border-radius: 5px; border-left: 5px solid #4da6ff; margin-bottom: 10px;">
+          <p style="margin: 0;"><strong>ユウタ</strong>：「今まで <code>println</code> していた部分が、これからは画面のどこに出てくるのか、ってことですね。」</p>
+        </div>
+        <div style="background-color: #ffe6f0; padding: 15px; border-radius: 5px; border-left: 5px solid #e8a0b0; margin-bottom: 10px;">
+          <p style="margin: 0;"><strong>ナナコ</strong>：「今日はまず、サーバのことは置いておいて、<strong>『入力の箱』と『出力の箱』としてのフォームとテーブル</strong>だけをしっかり作る回なんですね。」</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 学習目標 -->
+    <section style="margin-bottom: 30px;">
+      <h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+        2. この回の学習目標
+      </h2>
+
+      <ul style="padding-left: 20px; margin-bottom: 0;">
+        <li style="margin-bottom: 10px;">HTML だけで、<strong>商品登録フォーム＋ダミーの一覧テーブル</strong>を完成させる。</li>
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;form&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;input&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;button&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;table&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;tr&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;th&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;td&gt;</code> の役割を説明できる。</li>
+        <li style="margin-bottom: 10px;">フォームの <strong>name 属性</strong> が、将来 Servlet の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getParameter</code> につながる「ラベル」だとイメージできる。</li>
+      </ul>
+    </section>
+
+    <!-- 3. フォームの型（入力の箱） -->
+    <section style="margin-bottom: 30px;">
+      <h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+        3. 入力の箱：フォームの型
+      </h2>
+
+      <p style="margin-bottom: 10px;">まずは、<strong>商品名と価格を入力するためのフォーム</strong>を作ります。完成形は次のとおりです。</p>
+
+      <pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto;">
+&lt;form action=&quot;/dummy&quot; method=&quot;post&quot;&gt;
+  &lt;label&gt;商品名:
+    &lt;input type=&quot;text&quot; name=&quot;itemName&quot;&gt;
+  &lt;/label&gt;&lt;br&gt;
+
+  &lt;label&gt;価格:
+    &lt;input type=&quot;number&quot; name=&quot;price&quot;&gt;
+  &lt;/label&gt;&lt;br&gt;
+
+  &lt;button type=&quot;submit&quot;&gt;登録&lt;/button&gt;
+&lt;/form&gt;
+      </pre>
+
+      <p style="margin-bottom: 10px;">ここでは、サーバ側はまだ作っていないので、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">action=&quot;/dummy&quot;</code> として「とりあえずどこかに送る」イメージだけ持っておきます。</p>
+
+      <ul style="padding-left: 20px; margin-bottom: 0;">
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;form&gt;</code> … 1枚の「申込書」全体。</li>
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">action</code> … 申込書を送る先（URL）。</li>
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">method=&quot;post&quot;</code> … 送り方（POSTで送る）。</li>
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">name=&quot;itemName&quot;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">name=&quot;price&quot;</code> … 将来、Servlet の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getParameter(&quot;itemName&quot;)</code> などで取り出すときの「ラベル」。</li>
+      </ul>
+    </section>
+
+    <!-- 4. テーブルの型（出力の箱） -->
+    <section style="margin-bottom: 30px;">
+      <h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+        4. 出力の箱：テーブルの型
+      </h2>
+
+      <p style="margin-bottom: 10px;">次に、登録された商品を一覧で表示するための <strong>テーブル</strong> を作ります。まずはダミーデータ 1件でOKです。</p>
+
+      <pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto;">
+&lt;table border=&quot;1&quot;&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ID&lt;/th&gt;
+    &lt;th&gt;商品名&lt;/th&gt;
+    &lt;th&gt;価格&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;サンプル商品&lt;/td&gt;
+    &lt;td&gt;100&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+      </pre>
+
+      <ul style="padding-left: 20px; margin-bottom: 0;">
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;tr&gt;</code> … 横1行（レコード1件やヘッダ1行）。</li>
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;th&gt;</code> … 見出しセル（列の名前）。</li>
+        <li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;td&gt;</code> … データセル（ID=1 の商品などの値）。</li>
+      </ul>
+    </section>
+
+    <!-- 5. ハンズオン：1画面として並べてみる -->
+    <section style="margin-bottom: 30px;">
+      <h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+        5. ハンズオン：フォーム＋テーブルを1画面に並べる
+      </h2>
+
+      <p style="margin-bottom: 10px;">最後に、さきほどのフォームとテーブルを <strong>1つの画面</strong> に並べてみましょう。ここでは、レイアウトを単純にするために、フォーム → テーブルの縦並びにします。</p>
+
+      <pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto;">
+&lt;h2&gt;商品登録フォーム&lt;/h2&gt;
+
+&lt;form action=&quot;/dummy&quot; method=&quot;post&quot;&gt;
+  &lt;label&gt;商品名:
+    &lt;input type=&quot;text&quot; name=&quot;itemName&quot;&gt;
+  &lt;/label&gt;&lt;br&gt;
+
+  &lt;label&gt;価格:
+    &lt;input type=&quot;number&quot; name=&quot;price&quot;&gt;
+  &lt;/label&gt;&lt;br&gt;
+
+  &lt;button type=&quot;submit&quot;&gt;登録&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;h2&gt;商品一覧（サンプル）&lt;/h2&gt;
+
+&lt;table border=&quot;1&quot;&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ID&lt;/th&gt;
+    &lt;th&gt;商品名&lt;/th&gt;
+    &lt;th&gt;価格&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;1&lt;/td&gt;
+    &lt;td&gt;サンプル商品&lt;/td&gt;
+    &lt;td&gt;100&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+      </pre>
+    </section>
+
+    <!-- 6. まとめ -->
+    <section style="margin-bottom: 30px;">
+      <h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+        6. まとめ
+      </h2>
+
+      <ul style="padding-left: 20px; margin-bottom: 0;">
+        <li style="margin-bottom: 10px;">フォームは「申込書」、テーブルは「一覧表」。どちらも <strong>データの通り道の箱</strong> である。</li>
+        <li style="margin-bottom: 10px;">フォームの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">name</code> 属性は、将来 Servlet が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getParameter</code> で値を取り出すときの「ラベル」になる。</li>
+        <li style="margin-bottom: 10px;">テーブルの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;tr&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;th&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;td&gt;</code> は、将来の「レコード」と「カラム」に対応する。</li>
+      </ul>
+    </section>
+
+  </div>
+</body>
+</html>
+
