@@ -1,4 +1,4 @@
-/* 講義テキスト印刷用（A4）。LMS用HTMLとは別ファイルの -pdf.html から参照する。 */
+/* 講義テキスト印刷用（A4）。SQL単元は HtmAll-*.html、Java等は Html-*-pdf.html などから参照。 */
 
 @page {
 	size: A4;
