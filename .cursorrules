@@ -11,7 +11,7 @@
   - **HtmAll-××② ▲▲.html** — SQL単元など、本編から生成する**一式印刷用HTML**（DOCTYPE 付き・`assets/pdf-a4.css` 参照）。一覧先頭で本編 `Html-` と区別するためのプレフィックス。
   - **Base-××② ▲▲.html** — 講義用テキストPDF変更用（HTML）
   - **pdf-××② ▲▲.pdf** — 講義用テキストPDF変更用（PDF）
-  - **Pdf-××② ▲▲.pdf** — SQL単元など、講義HTMLから一括生成した閲覧・印刷用PDF（例：`Unit01_SQL/Pdf-01 … .pdf`。元は `HtmAll-… .html`。生成は `scripts/build_unit01_sql_pdf.py`）
+  - **Pdf-××② ▲▲.pdf** — SQL単元など、講義HTMLから一括生成した閲覧・印刷用PDF（例：`Unit01_SQL/Pdf-01 … .pdf`、`Unit02_JDBC/Pdf-02 … .pdf`。元は `HtmAll-… .html`。生成は `scripts/build_unit01_sql_pdf.py` / `scripts/build_unit02_jdbc_pdf.py`）
   - **Test-確認テスト○○.html** — 理解度の確認テスト
   - **Desc-概要○○.html** — Lessonの概要
 

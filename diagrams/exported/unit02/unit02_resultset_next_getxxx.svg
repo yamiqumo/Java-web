@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" width="720" height="260">
+  <rect width="720" height="260" fill="#fff"/>
+  <text x="360" y="30" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#0033ff" font-weight="bold">ResultSet：カーソルを進めて列を取り出す</text>
+  <rect x="50" y="50" width="620" height="95" rx="6" fill="#fff" stroke="#e1dbbd" stroke-width="1"/>
+  <text x="360" y="78" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#666">（結果のイメージ：複数行）</text>
+  <line x1="50" y1="88" x2="670" y2="88" stroke="#ccc"/>
+  <rect x="55" y="92" width="200" height="22" fill="#f0f8ff"/>
+  <rect x="260" y="92" width="200" height="22" fill="#f0f8ff"/>
+  <rect x="465" y="92" width="200" height="22" fill="#f0f8ff"/>
+  <text x="155" y="108" text-anchor="middle" font-family="monospace" font-size="11" fill="#333">item_id</text>
+  <text x="360" y="108" text-anchor="middle" font-family="monospace" font-size="11" fill="#333">item_name</text>
+  <text x="565" y="108" text-anchor="middle" font-family="monospace" font-size="11" fill="#333">unit_price</text>
+  <text x="155" y="132" text-anchor="middle" font-family="monospace" font-size="11" fill="#333">101</text>
+  <text x="360" y="132" text-anchor="middle" font-family="monospace" font-size="11" fill="#333">水</text>
+  <text x="565" y="132" text-anchor="middle" font-family="monospace" font-size="11" fill="#333">100</text>
+  <polygon points="50,115 40,125 50,135" fill="#0033ff" opacity="0.85"/>
+  <text x="75" y="148" font-family="sans-serif" font-size="11" fill="#0033ff">カーソル（先頭は行の手前）</text>
+  <rect x="50" y="160" width="620" height="85" rx="6" fill="#fdf5e6" stroke="#e1dbbd"/>
+  <text x="70" y="188" font-family="monospace" font-size="13" fill="#333">while (rs.next()) {</text>
+  <text x="90" y="210" font-family="monospace" font-size="13" fill="#0033ff">int id = rs.getInt("item_id");</text>
+  <text x="90" y="230" font-family="monospace" font-size="13" fill="#0033ff">String name = rs.getString("item_name");</text>
+  <text x="70" y="248" font-family="monospace" font-size="13" fill="#333">}</text>
+</svg>
