@@ -1,0 +1,59 @@
+第2回（復習）：JDBC接続の基本 — 自習（せかチャン動画・テキスト→動画→手を動かす）
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		第2回（復習）：JDBC接続の基本 — 自習（せかチャン動画）
+	</h1>
+
+	<p style="margin: 0 0 18px 0;">このページは<strong>復習・予習専用</strong>です。講義の本編は <strong>Html-02 JDBC接続の基本.html</strong> を参照してください。次の Lesson（Unit 3）の冒頭で理解度を確認する想定で、自分のペースで繰り返し使えます。</p>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			自習：テキスト→動画→手を動かす
+		</h2>
+		<p style="margin: 0 0 12px 0;">各ブロックは <strong>読む → 見る → やる → 振り返り</strong> の順で進めてください。</p>
+		<p style="margin: 0 0 12px 0; font-size: 12px; color: #666;">※ YouTube側の仕様やLMSの制限により、終了時刻（end）での<strong>自動停止は保証できません</strong>。各ブロックの「手動停止の目安」を目印に止めてください。</p>
+
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fafafa; border: 1px solid #e1dbbd; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #444;">
+			<p style="margin: 0;"><strong>教材利用に関するクレジット</strong>：本セクションの動画教材は、YouTubeチャンネル「せかチャン（世界一わかりやすいIT基礎講座）」のコンテンツを、YouTubeの利用規約および埋め込みポリシーに基づき公式埋め込み機能にて使用しています。</p>
+		</div>
+
+		<p style="margin: 0 0 16px 0;"><strong>動画（共通）</strong>：JDBCプログラミングを完全解説（基礎編）／YouTube</p>
+
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック1：JDBCの役割と全体像</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜5分）</strong></p>
+			<p style="margin: 0 0 10px 0;">JDBC（Java Database Connectivity）は、Javaプログラムとデータベースを繋ぐ「架け橋」となる標準APIです。DBの種類が変わってもJava側を大きく変えずに済むよう、<strong>ドライバ</strong>が差分を吸収します。</p>
+			<p style="margin: 0 0 12px 0;"><strong>動画で確認すること</strong>：Javaアプリ、JDBC、ドライバ、DBの4層の関係。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：開始 <strong>00:00</strong>　終了（手動停止の目安） <strong>01:35</strong>（JDBCの図が消えるまで）</p>
+			<iframe src="https://www.youtube.com/embed/wu4YCDyJFPg?start=0&amp;end=90&amp;rel=0&amp;enablejsapi=1" name="block1_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 12px 0;"><a href="https://www.youtube.com/embed/wu4YCDyJFPg?start=0&amp;end=90&amp;autoplay=1" target="block1_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（0:00〜）</a></p>
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：ノートに「Javaアプリ → JDBC → ドライバ → DB」の4階層と、データの流れ（矢印）を書く。</p>
+			<p style="margin: 0;"><strong>振り返り</strong>：[ ] JDBCが何と何の架け橋か、口頭で説明できる。</p>
+		</div>
+
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック2：JDBC接続の「4ステップ」</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜5分）</strong></p>
+			<p style="margin: 0 0 8px 0;">ドライバのロード → 接続（Connection）→ SQL実行（Statement）→ 切断（Close）の4ステップ。</p>
+			<p style="margin: 0 0 12px 0;"><strong>動画で確認すること</strong>：各ステップの主要クラス／インタフェース名（Connection, Statement など）。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：開始 <strong>01:30</strong>　終了（手動停止の目安） <strong>04:40</strong>（コード解説が始まる直前まで）</p>
+			<iframe src="https://www.youtube.com/embed/wu4YCDyJFPg?start=90&amp;end=270&amp;rel=0&amp;enablejsapi=1" name="block2_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 12px 0;"><a href="https://www.youtube.com/embed/wu4YCDyJFPg?start=90&amp;end=270&amp;autoplay=1" target="block2_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（1:30〜）</a></p>
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：4ステップの名称とJavaオブジェクト名を矢印付きでノートに書く（例：2.接続 → Connection）。</p>
+			<p style="margin: 0;"><strong>振り返り</strong>：[ ] 4ステップを何も見ずに順番通り口頭で言える。</p>
+		</div>
+
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック3：接続と切断の実装（写経）</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜5分）</strong></p>
+			<p style="margin: 0 0 12px 0;">ロード・接続・切断をコードで。try-with-resources や finally での後片付けを忘れないこと。<strong>動画で確認</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DriverManager.getConnection()</code> の URL・ユーザ・パスワード。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：開始 <strong>04:30</strong>　終了（手動停止の目安） <strong>08:10</strong></p>
+			<iframe src="https://www.youtube.com/embed/wu4YCDyJFPg?start=270&amp;end=490&amp;rel=0&amp;enablejsapi=1" name="block3_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 12px 0;"><a href="https://www.youtube.com/embed/wu4YCDyJFPg?start=270&amp;end=490&amp;autoplay=1" target="block3_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（4:30〜）</a></p>
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit02_JDBC/src/SampleConnection.java</code> を作成し、動画の接続コードを写経。URL・ユーザ・パスワードは環境に合わせて読み替える。</p>
+			<p style="margin: 0;"><strong>振り返り</strong>：[ ] 接続に成功し、コンソールにエラーが出ないことを確認した。</p>
+		</div>
+	</section>
+
+</div>

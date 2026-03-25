@@ -63,32 +63,144 @@ INSERT ▶ SELECT ▶ UPDATE ▶ SELECT ▶ DELETE ▶ SELECT</pre>
 			</ul>
 		</div>
 
-		<details style="margin: 15px 0;">
-			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">参照図（クリックで開く）</summary>
-			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 10px 0;">この回で扱う「DBの見方」と「SQLの位置づけ」を、図でまとめます。</p>
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			SQL
+		</h3>
 
-				<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-					<p style="margin: 0 0 8px 0;"><strong>SQLの位置づけ</strong>：DBMSに命令を出すための共通言語がSQLです。</p>
-					<img src="../diagrams/exported/unit01/unit01_sql_position.png" alt="SQLの位置づけ（DBMSに命令を出す共通言語）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
-				</div>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">この回で扱う <strong>SQLの役割と基本の書き方</strong> を、図とあわせて整理しておきます。iPadで表示して、上から書き込みながら説明できるようにまとめています。</p>
 
-				<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-					<p style="margin: 0 0 8px 0;"><strong>テーブル（列と行）</strong>：列＝項目、行＝1件分のデータです。</p>
-					<img src="../diagrams/exported/unit01/unit01_table_column_row.png" alt="テーブルの列と行（カラムとロウ）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
-				</div>
-
-				<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-					<p style="margin: 0 0 8px 0;"><strong>主キーと外部キー（リレーション）</strong>：テーブル同士のつながりを作るためのキーです。</p>
-					<img src="../diagrams/exported/unit01/unit01_keys_relation.png" alt="主キーと外部キー（リレーション）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
-				</div>
-
-				<div style="margin: 10px 0 0 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-					<p style="margin: 0 0 8px 0;"><strong>正規化（概要）</strong>：現実のまとまりある情報を、意味ごとに分割してテーブルに整理します。</p>
-					<img src="../diagrams/exported/unit01/unit01_normalization_overview.png" alt="正規化の概要（意味ごとに分割して整理）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
-				</div>
+			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0;"><strong>SQLの位置づけ</strong>：アプリやツールの代わりに、DBMSに命令を出すための共通言語がSQLです。</p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit01/unit01_sql_position.png" alt="SQLの位置づけ（DBMSに命令を出す共通言語）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
-		</details>
+
+			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0;"><strong>テーブル（列と行）</strong>：列＝項目、行＝1件分のデータです。</p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit01/unit01_table_column_row.png" alt="テーブルの列と行（カラムとロウ）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			</div>
+
+			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0;"><strong>主キーと外部キー（リレーション）</strong>：テーブル同士のつながりを作るためのキーです。</p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit01/unit01_keys_relation.png" alt="主キーと外部キー（リレーション）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			</div>
+
+			<div style="margin: 10px 0 0 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0;"><strong>正規化（概要）</strong>：現実のまとまりある情報を、意味ごとに分割してテーブルに整理します。</p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit01/unit01_normalization_overview.png" alt="正規化の概要（意味ごとに分割して整理）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			</div>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			SQLの基本文（SELECT / WHERE / ORDER BY）
+		</h3>
+
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<h4 style="margin: 0 0 8px 0; font-size: 15px; color: #0033ff;">SELECT：どのカラムを「見る」か決める</h4>
+			<p style="margin: 0 0 8px 0;">SELECT は「どのカラムを、どのテーブルから取り出して表示するか」を決める文です。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT *</code> は「全部のカラム」、カンマ区切りで列名を書くと「必要なカラムだけ」取り出せます。</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">-- すべてのカラムを表示
+SELECT * FROM items;
+
+-- 一部のカラムだけ表示
+SELECT item_id, item_name
+FROM items;</pre>
+			<ul style="padding-left: 20px; margin: 8px 0 0 0;">
+				<li style="margin-bottom: 6px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">*</code> は最初の練習では便利だが、本番では<strong>必要なカラムだけ</strong>列挙するのが基本。</li>
+				<li style="margin-bottom: 0;">カラム名の順番は、画面に出てくる列の順番にもなる。</li>
+			</ul>
+
+			<h4 style="margin: 15px 0 8px 0; font-size: 15px; color: #0033ff;">WHERE：条件でしぼり込む</h4>
+			<p style="margin: 0 0 8px 0;">WHERE は「どの行を対象にするか」を決める条件の文です。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE 列 演算子 値</code> の形で書きます。</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">SELECT *
+FROM items
+WHERE category = 'drink';</pre>
+			<p style="margin: 0 0 6px 0;"><strong>主な演算子</strong>（数値・文字に共通）</p>
+			<ul style="padding-left: 20px; margin: 0 0 8px 0;">
+				<li style="margin-bottom: 4px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">=</code>：等しい（例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price = 100</code>）</li>
+				<li style="margin-bottom: 4px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;=</code>：より小さい / 以下</li>
+				<li style="margin-bottom: 4px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&gt;</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&gt;=</code>：より大きい / 以上</li>
+				<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&lt;&gt;</code>：等しくない（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">!=</code> を使うDBもある）</li>
+			</ul>
+
+			<p style="margin: 10px 0 6px 0;"><strong>BETWEEN：範囲でしぼり込む</strong></p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">-- 100円以上 150円以下
+SELECT *
+FROM items
+WHERE unit_price BETWEEN 100 AND 150;</pre>
+			<ul style="padding-left: 20px; margin: 0 0 8px 0;">
+				<li style="margin-bottom: 4px;">BETWEEN は「両端を含む」範囲（以上かつ以下）になる。</li>
+				<li style="margin-bottom: 0;">日付でも同じ書き方ができる（例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE order_date BETWEEN '2025-04-01' AND '2025-04-30'</code>）。</li>
+			</ul>
+
+			<p style="margin: 10px 0 6px 0;"><strong>LIKE とあいまい検索</strong></p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">-- 「茶」で終わる飲み物
+SELECT *
+FROM items
+WHERE item_name LIKE '%茶';</pre>
+			<ul style="padding-left: 20px; margin: 0 0 8px 0;">
+				<li style="margin-bottom: 4px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">%</code>：0文字以上の「なんでも」（前方一致・後方一致・部分一致に使う）。</li>
+				<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">_</code>：1文字だけ「なんでも」。</li>
+			</ul>
+
+			<p style="margin: 10px 0 6px 0;"><strong>IS NULL：NULL（まだ値が入っていない）の判定</strong></p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">SELECT *
+FROM items
+WHERE some_column IS NULL;
+
+SELECT *
+FROM items
+WHERE some_column IS NOT NULL;</pre>
+			<ul style="padding-left: 20px; margin: 0 0 8px 0;">
+				<li style="margin-bottom: 4px;">NULL は「0」でも「空文字」でもなく、「まだ値が入っていない・わからない」という特別な値。</li>
+				<li style="margin-bottom: 0;">NULL との比較は <strong>= ではなく IS</strong> を使う（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">= NULL</code> と書くとヒットしない）。</li>
+			</ul>
+
+			<p style="margin: 10px 0 6px 0;"><strong>AND / OR：条件を組み合わせる</strong></p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">SELECT *
+FROM items
+WHERE category = 'drink'
+AND unit_price &gt; 100;</pre>
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 4px;"><strong>AND</strong>：両方の条件を満たす行だけ残す。</li>
+				<li style="margin-bottom: 0;"><strong>OR</strong>：どちらか一方でも満たす行を残す（条件がゆるくなりやすいので注意）。</li>
+			</ul>
+
+			<h4 style="margin: 20px 0 8px 0; font-size: 15px; color: #0033ff;">ORDER BY：並び順を決める</h4>
+			<p style="margin: 0 0 8px 0;">ORDER BY は「結果をどの順番で並べるか」を決める文です。書く位置は <strong>WHERE のあと</strong> になります。</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">-- 単価の高い順（降順）
+SELECT *
+FROM items
+ORDER BY unit_price DESC;
+
+-- スナックだけを、安い順（昇順）に並べる
+SELECT *
+FROM items
+WHERE category = 'snack'
+ORDER BY unit_price ASC;</pre>
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 4px;"><strong>ASC</strong>：昇順（小さい→大きい）。省略するとASCになる。</li>
+				<li style="margin-bottom: 4px;"><strong>DESC</strong>：降順（大きい→小さい）。</li>
+				<li style="margin-bottom: 0;">複数カラムで並べたいときは、カンマでつなぐ（例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ORDER BY category ASC, unit_price DESC</code>）。</li>
+			</ul>
+			<p style="margin: 12px 0 6px 0;"><strong>次は、データを変える3文</strong></p>
+			<ul style="padding-left: 20px; margin: 0 0 8px 0;">
+				<li style="margin-bottom: 6px;"><strong>INSERT</strong>：行を追加。例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">INSERT INTO items ( ... ) VALUES ( ... );</code>（<strong>item_id</strong> が重複すると失敗しやすい）</li>
+				<li style="margin-bottom: 6px;"><strong>UPDATE</strong>：行を更新。基本は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">UPDATE items SET ... WHERE item_id = ...;</code>（<strong>WHEREなし</strong>は全行更新になりやすい）</li>
+				<li style="margin-bottom: 0;"><strong>DELETE</strong>：行を削除。基本は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DELETE FROM items WHERE item_id = ...;</code>（<strong>WHEREなし</strong>は全削除になりやすい）</li>
+			</ul>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">-- INSERT（行を追加）
+INSERT INTO items (item_id, category, item_name, unit_price) 
+VALUES (303, 'drink', 'サンプル2', 140);
+
+-- UPDATE（1行だけ変更：WHEREで狙う）
+UPDATE items
+SET unit_price = 110
+WHERE item_id = 101;
+
+-- DELETE（1行だけ削除：WHEREで狙う）
+DELETE FROM items
+WHERE item_id = 202;</pre>
+		</div>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
 			3-2. MySQLに入る（最小）
@@ -96,11 +208,13 @@ INSERT ▶ SELECT ▶ UPDATE ▶ SELECT ▶ DELETE ▶ SELECT</pre>
 
 		<p style="margin-bottom: 10px;">ローカル環境では、次のようにMySQLに入って操作します。</p>
 
-		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">mysql -u root</pre>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">mysql -u root -p</pre>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
 			3-3. DBを触る最初の3コマンド
 		</h3>
+
+		<p style="margin-bottom: 10px;">MySQL に入ったあと、まずは「どんなDB・テーブルがあるか」を見るための3つのコマンドです。</p>
 
 		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">SHOW DATABASES;
 USE database_name;
