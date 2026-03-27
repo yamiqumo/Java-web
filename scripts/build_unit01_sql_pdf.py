@@ -23,7 +23,7 @@ def find_chrome_exe() -> pathlib.Path | None:
 
 def main() -> int:
 	root = pathlib.Path(__file__).resolve().parents[1]
-	src = root / "Unit01_SQL" / "Html-01 SQL基礎（SELECT-INSERT）.html"
+	src = root / "Unit01_SQL" / "01-テキスト-SQL基礎（SELECT-INSERT）.html"
 	if not src.exists():
 		print("SOURCE_NOT_FOUND", src, file=sys.stderr)
 		return 1
@@ -47,14 +47,14 @@ def main() -> int:
 		1,
 	)
 
-	# 一覧の先頭数文字で本編 Html- と区別するため HtmAll- プレフィックス（HTML全体・印刷用）
-	pdf_html = root / "Unit01_SQL" / "HtmAll-01 SQL基礎（SELECT-INSERT）.html"
+	# PDF生成用HTML（src/template.html に出力）
+	pdf_html = root / "Unit01_SQL" / "src" / "template.html"
 	doc = f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <title>{title}</title>
-<link rel="stylesheet" href="../assets/pdf-a4.css">
+<link rel="stylesheet" href="../../assets/pdf-a4.css">
 </head>
 <body>
 {body_inner}
@@ -66,10 +66,10 @@ def main() -> int:
 
 	chrome = find_chrome_exe()
 	if chrome is None:
-		print("CHROME_NOT_FOUND: PDFは手動で「HtmAll-01 SQL基礎（SELECT-INSERT）.html」を開き印刷してください。", file=sys.stderr)
+		print("CHROME_NOT_FOUND: PDFは手動で「Unit01_SQL/src/template.html」を開き印刷してください。", file=sys.stderr)
 		return 0
 
-	out_pdf = root / "Unit01_SQL" / "Pdf-01 SQL基礎（SELECT-INSERT）.pdf"
+	out_pdf = root / "Unit01_SQL" / "99-テキストpdf-SQL基礎（SELECT-INSERT）.pdf"
 	url = pdf_html.resolve().as_uri()
 
 	cmd = [
