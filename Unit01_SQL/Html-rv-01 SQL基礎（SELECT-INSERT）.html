@@ -1,0 +1,371 @@
+第1回（復習）：SQL基礎（SELECT/INSERT）— 自習（キノコード動画・テキスト→動画→手を動かす）
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		第1回（復習）：SQL基礎（SELECT/INSERT）— 自習（キノコード動画）
+	</h1>
+
+	<p style="margin: 0 0 18px 0;">このページは<strong>復習・予習専用</strong>です。講義の本編は <strong>Html-01 SQL基礎（SELECT-INSERT）.html</strong> を参照してください。次の Lesson（Unit 2）の冒頭で理解度を確認する想定で、自分のペースで繰り返し使えます。</p>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			自習：動画 → やる → 振り返り
+		</h2>
+		<p style="margin: 0 0 12px 0;">各ブロックは <strong>読む → 見る → やる → 振り返り</strong> の順で進めてください。</p>
+		<p style="margin: 0 0 12px 0; font-size: 12px; color: #666;">※ YouTube側の仕様やLMSの制限により、終了時刻（end）での<strong>自動停止は保証できません</strong>。各ブロックの「手動停止の目安」を目印に止めてください。</p>
+
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fafafa; border: 1px solid #e1dbbd; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #444;">
+			<p style="margin: 0;"><strong>教材利用に関するクレジット</strong>：本セクションの動画教材は、YouTubeチャンネル「キノコード / プログラミング学習チャンネル」のコンテンツを、YouTubeの利用規約および埋め込みポリシーに基づき公式埋め込み機能にて使用しています。</p>
+		</div>
+
+		<!-- ===== ブロック1：SELECT文の基本 ===== -->
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック1：SELECT文の基本</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜3分）</strong></p>
+			<p style="margin: 0 0 10px 0;">SELECT はテーブルから「どのカラムを取り出すか」を決める命令です。<strong>SELECT *</strong> はすべてのカラム、カンマ区切りで列名を書くと必要なカラムだけ取り出せます。FROM のあとにテーブル名を書く点も忘れずに。</p>
+			<p style="margin: 0 0 12px 0;"><strong>動画で確認すること</strong>：SELECT * と SELECT 列名 の違い、複数カラム指定のカンマ区切り。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：動画を<strong>最後まで</strong>視聴（目安 5分程度）</p>
+			<p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">動画：【SQL超入門講座】03.SELECT文｜SQLの基本中の基本（キノコード）</p>
+			<iframe src="https://www.youtube.com/embed/3zy3V01ziqU?start=0&amp;rel=0&amp;enablejsapi=1" name="block1_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 14px 0;"><a href="https://www.youtube.com/embed/3zy3V01ziqU?start=0&amp;autoplay=1" target="block1_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（0:00〜）</a></p>
+
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：下の問題を解いてから、ヒント・解答例を確認してください。</p>
+
+			<!-- 問題1-1 -->
+			<p style="margin: 10px 0 5px 0;"><strong>問題1</strong>：itemsテーブルの全データをすべてのカラムで表示するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT *</code> はすべてのカラムを取り出す書き方です。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">FROM</code> のあとにテーブル名を書きます。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SELECT * FROM items;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 55px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SELECT * FROM items;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<!-- 問題1-2 -->
+			<p style="margin: 20px 0 5px 0;"><strong>問題2</strong>：itemsテーブルから <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_id</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> の2カラムだけを表示するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT</code> のあとに取り出したいカラム名をカンマ区切りで書きます。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">*</code> を使わない場合、必要な列だけを指定できます。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SELECT item_id, item_name
+FROM items;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 70px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SELECT item_id, item_name
+FROM items;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<p style="margin: 16px 0 0 0;"><strong>振り返り</strong>：[ ] SELECT * と SELECT 列名指定 の違いを、口頭で説明できる。</p>
+		</div>
+
+		<!-- ===== ブロック2：WHERE条件 ===== -->
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック2：WHERE で行を絞り込む</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜3分）</strong></p>
+			<p style="margin: 0 0 10px 0;">WHERE は「どの行を対象にするか」を決める条件の指定です。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE 列 演算子 値</code> の形で書きます。文字列は<strong>シングルクォート</strong>で囲み、数値は囲みません。</p>
+			<p style="margin: 0 0 12px 0;"><strong>動画で確認すること</strong>：= / &lt;= / &gt;= / &lt;&gt; の使い分け、文字列比較のシングルクォート。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：動画を<strong>最後まで</strong>視聴（目安 6分程度）</p>
+			<p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">動画：【SQL超入門講座】04.WHERE｜特定の条件でデータを抽出する方法（キノコード）</p>
+			<iframe src="https://www.youtube.com/embed/G5E7lVS7UsI?start=0&amp;rel=0&amp;enablejsapi=1" name="block2_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 14px 0;"><a href="https://www.youtube.com/embed/G5E7lVS7UsI?start=0&amp;autoplay=1" target="block2_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（0:00〜）</a></p>
+
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：下の問題を解いてから、ヒント・解答例を確認してください。</p>
+
+			<!-- 問題2-1 -->
+			<p style="margin: 10px 0 5px 0;"><strong>問題3</strong>：category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'drink'</code> の商品をすべてのカラムで表示するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE 列名 = '値'</code> の形で条件を書きます。文字列はシングルクォートで囲みます。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SELECT *
+FROM items
+WHERE category = 'drink';</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 85px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SELECT *
+FROM items
+WHERE category = 'drink';</textarea>
+					</div>
+				</div>
+			</details>
+
+			<!-- 問題2-2 -->
+			<p style="margin: 20px 0 5px 0;"><strong>問題4</strong>：unit_price が 120 以上の商品の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code> を表示するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;">「以上」は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">&gt;=</code> です。数値はシングルクォート不要。取り出すカラムを SELECT で列挙します。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SELECT item_name, unit_price
+FROM items
+WHERE unit_price &gt;= 120;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 85px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SELECT item_name, unit_price
+FROM items
+WHERE unit_price >= 120;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<p style="margin: 16px 0 0 0;"><strong>振り返り</strong>：[ ] 文字列はシングルクォート、数値はそのまま—この違いを説明できる。</p>
+		</div>
+
+		<!-- ===== ブロック3：ORDER BY ===== -->
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック3：ORDER BY で並び順を決める</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜3分）</strong></p>
+			<p style="margin: 0 0 10px 0;">ORDER BY は「結果をどの順で並べるか」を決めます。<strong>ASC</strong>は昇順（小さい順・省略可）、<strong>DESC</strong>は降順（大きい順）。書く位置は <strong>WHERE のあと</strong>になります。</p>
+			<p style="margin: 0 0 12px 0;"><strong>動画で確認すること</strong>：ASC と DESC の違い、WHERE + ORDER BY を組み合わせるときの書く順番。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：動画を<strong>最後まで</strong>視聴（目安 7分程度）</p>
+			<p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">動画：【SQL超入門講座】05.ORDER BY｜データの並び替え（キノコード）</p>
+			<iframe src="https://www.youtube.com/embed/5o25D6T8IVc?start=0&amp;rel=0&amp;enablejsapi=1" name="block3_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 14px 0;"><a href="https://www.youtube.com/embed/5o25D6T8IVc?start=0&amp;autoplay=1" target="block3_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（0:00〜）</a></p>
+
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：下の問題を解いてから、ヒント・解答例を確認してください。</p>
+
+			<!-- 問題3-1 -->
+			<p style="margin: 10px 0 5px 0;"><strong>問題5</strong>：itemsテーブルの全商品を、unit_price の高い順に並べて表示するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ORDER BY 列名 DESC</code> で降順（大きい順）に並べられます。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SELECT *
+FROM items
+ORDER BY unit_price DESC;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 85px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SELECT *
+FROM items
+ORDER BY unit_price DESC;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<!-- 問題3-2 -->
+			<p style="margin: 20px 0 5px 0;"><strong>問題6</strong>：category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'snack'</code> の商品を、unit_price の安い順に並べて表示するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;">WHERE で絞り込んだあとに ORDER BY を書きます。書く順番は <strong>WHERE → ORDER BY</strong> です。昇順は ASC（省略可）。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SELECT *
+FROM items
+WHERE category = 'snack'
+ORDER BY unit_price ASC;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 100px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SELECT *
+FROM items
+WHERE category = 'snack'
+ORDER BY unit_price ASC;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<p style="margin: 16px 0 0 0;"><strong>振り返り</strong>：[ ] WHERE と ORDER BY を組み合わせるとき、書く順番（WHERE が先）を言える。</p>
+		</div>
+
+		<!-- ===== ブロック4：INSERT + 手順の型 ===== -->
+		<div style="margin-bottom: 22px; padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff; font-size: 16px;">ブロック4：INSERT / UPDATE / DELETE と手順の型</p>
+			<p style="margin: 0 0 8px 0;"><strong>読む（2〜3分）</strong></p>
+			<p style="margin: 0 0 8px 0;">データを<strong>変える</strong>3文の役割を整理します。</p>
+			<ul style="padding-left: 20px; margin: 0 0 10px 0;">
+				<li style="margin-bottom: 6px;"><strong>INSERT INTO ... VALUES</strong>：行を1件追加する。主キー（item_id）の重複に注意。</li>
+				<li style="margin-bottom: 6px;"><strong>UPDATE ... SET ... WHERE</strong>：指定した行の値を変える。<strong>WHERE なし = 全行変更</strong>になるため必ず id を指定。</li>
+				<li style="margin-bottom: 0;"><strong>DELETE FROM ... WHERE</strong>：指定した行を削除する。<strong>WHERE なし = 全削除</strong>になるため必ず id を指定。</li>
+			</ul>
+			<p style="margin: 0 0 12px 0;"><strong>動画で確認すること</strong>：テーブルの「カラム（列）」と「行」の関係、INSERT でどの列に何を入れるかの指定。</p>
+			<p style="margin: 0 0 6px 0;"><strong>見る</strong>：動画を<strong>最後まで</strong>視聴（目安 5分程度）</p>
+			<p style="margin: 0 0 4px 0; font-size: 12px; color: #666;">動画：【SQL超入門講座】02.データベースのテーブルとは？｜初心者向け｜Excelに例えて説明します（キノコード）</p>
+			<iframe src="https://www.youtube.com/embed/BHfzp1rh2sk?start=0&amp;rel=0&amp;enablejsapi=1" name="block4_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
+			<p style="margin: 0 0 14px 0;"><a href="https://www.youtube.com/embed/BHfzp1rh2sk?start=0&amp;autoplay=1" target="block4_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（0:00〜）</a></p>
+
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：初期データを実行してから、下の問題に取り組んでください。</p>
+
+			<p style="margin: 8px 0 6px 0; font-weight: bold; font-size: 13px;">最初に流し込むSQL（テーブル作成＋初期データ）</p>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 16px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして、手元のツールに貼り付けて実行してください：</p>
+				<textarea readonly style="width: 100%; height: 200px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
+
+CREATE TABLE items (
+	item_id INT NOT NULL,
+	category VARCHAR(30) NOT NULL,
+	item_name VARCHAR(80) NOT NULL,
+	unit_price INT NOT NULL,
+	PRIMARY KEY (item_id)
+);
+
+INSERT INTO items (item_id, category, item_name, unit_price) VALUES
+	(101, 'drink', '水', 100),
+	(102, 'drink', 'お茶', 120),
+	(201, 'snack', 'ポテトチップス', 150),
+	(202, 'snack', 'チョコ', 130);
+
+SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;</textarea>
+			</div>
+
+			<!-- 問題4-1 -->
+			<p style="margin: 10px 0 5px 0;"><strong>問題7</strong>：item_id が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">303</code>、category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'drink'</code>、item_name が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'サンプル飲料'</code>、unit_price が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">140</code> の商品を追加し、その後 SELECT で一覧を確認するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0 0 6px 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">INSERT INTO テーブル名 (カラム1, ...) VALUES (値1, ...);</code> の形で書きます。文字列はシングルクォート。INSERT の直後に SELECT で追加できたことを確認するのが「手順の型」です。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">-- INSERT（行を追加）
+INSERT INTO items (item_id, category, item_name, unit_price)
+VALUES (303, 'drink', 'サンプル飲料', 140);
+
+-- SELECT で確認（増えたか？）
+SELECT item_id, category, item_name, unit_price
+FROM items
+ORDER BY item_id;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 155px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">-- INSERT（行を追加）
+INSERT INTO items (item_id, category, item_name, unit_price)
+VALUES (303, 'drink', 'サンプル飲料', 140);
+
+-- SELECT で確認（増えたか？）
+SELECT item_id, category, item_name, unit_price
+FROM items
+ORDER BY item_id;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<!-- 問題4-2 -->
+			<p style="margin: 20px 0 5px 0;"><strong>問題8</strong>：item_id が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">101</code> の unit_price を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">110</code> に変更し、その後 SELECT で変わったことを確認するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">UPDATE テーブル名 SET 列 = 新しい値 WHERE item_id = ○○;</code> の形で書きます。<strong>WHERE なしは全行変更</strong>になるので必ず id を指定してください。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">-- UPDATE（1行だけ変更：WHERE で狙う）
+UPDATE items
+SET unit_price = 110
+WHERE item_id = 101;
+
+-- SELECT で確認（変わったか？）
+SELECT item_id, category, item_name, unit_price
+FROM items
+WHERE item_id = 101;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 155px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">-- UPDATE（1行だけ変更：WHERE で狙う）
+UPDATE items
+SET unit_price = 110
+WHERE item_id = 101;
+
+-- SELECT で確認（変わったか？）
+SELECT item_id, category, item_name, unit_price
+FROM items
+WHERE item_id = 101;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<!-- 問題4-3 -->
+			<p style="margin: 20px 0 5px 0;"><strong>問題9</strong>：item_id が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">202</code> の行を削除し、その後 SELECT で行数が減ったことを確認するSQLを書いてください。</p>
+			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DELETE FROM テーブル名 WHERE item_id = ○○;</code> の形で書きます。<strong>WHERE なしは全削除</strong>になるので必ず id を指定してください。</p>
+				</div>
+			</details>
+			<details style="margin-top: 5px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">-- DELETE（1行だけ削除：WHERE で狙う）
+DELETE FROM items
+WHERE item_id = 202;
+
+-- SELECT で確認（減ったか？）
+SELECT item_id, category, item_name, unit_price
+FROM items
+ORDER BY item_id;</pre>
+					<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 140px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">-- DELETE（1行だけ削除：WHERE で狙う）
+DELETE FROM items
+WHERE item_id = 202;
+
+-- SELECT で確認（減ったか？）
+SELECT item_id, category, item_name, unit_price
+FROM items
+ORDER BY item_id;</textarea>
+					</div>
+				</div>
+			</details>
+
+			<p style="margin: 16px 0 0 0;"><strong>振り返り</strong>：[ ] UPDATE と DELETE に WHERE が必要な理由を、口頭で説明できる。</p>
+		</div>
+
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			まとめ（手順の型を声に出して確認）
+		</h2>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">
+INSERT ▶ SELECT ▶ UPDATE ▶ SELECT ▶ DELETE ▶ SELECT
+
+SELECT = 取り出して見る（結果は表示用の表）
+INSERT = 1行追加（SELECT で増えたことを確認）
+UPDATE = 1行変更（WHERE で狙って・SELECT で確認）
+DELETE = 1行削除（WHERE で狙って・SELECT で確認）</pre>
+	</section>
+
+</div>

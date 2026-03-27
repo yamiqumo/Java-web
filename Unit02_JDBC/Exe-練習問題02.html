@@ -1,0 +1,914 @@
+JDBC 基本問題（items・emps）〜ResultSet からデータを取り出して Java で加工する〜
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		JDBC 基本問題（items・emps）〜ResultSet からデータを取り出して Java で加工する〜
+	</h1>
+
+	<!-- ===== 導入 ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			この演習の目的
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 10px 0;">JDBC の4ステップ（<strong>接続→準備→実行→結果取得</strong>）を守りながら、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> から値を取り出し、<strong>Java 側で集計・加工・出力</strong>する練習です。</p>
+				<ul style="padding-left: 20px; margin: 0;">
+					<li style="margin-bottom: 6px;"><strong>前半（items）</strong>：単一テーブルから値を取り出し、ループ・条件判定・計算を行う。</li>
+					<li style="margin-bottom: 6px;"><strong>後半（emps）</strong>：複数カラムを組み合わせ、特定条件での抽出・集計に慣れる。</li>
+					<li style="margin-bottom: 0;">すべての問題で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">try-with-resources</code> を使い、リソースを適切に閉じること。</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===== DBデータの確認 ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			利用するテーブルの確認
+		</h2>
+
+		<p style="margin-bottom: 10px;">「環境構築：MySQL のセットアップとDB接続手順」（Html-env-01）でDB（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">training</code>）に流し込んだ以下の3テーブルを使います。</p>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0;"><strong>items</strong>（商品管理：10件）</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 15px 0;">item_id | category    | item_name      | unit_price
+--------+-------------+----------------+-----------
+101     | drink       | 水             | 100
+102     | drink       | お茶           | 120
+103     | drink       | コーヒー       | 150
+201     | snack       | ポテトチップス | 150
+202     | snack       | チョコ         | 130
+203     | snack       | せんべい       | 110
+301     | stationery  | ペン           |  80
+302     | stationery  | ノート         | 200
+303     | stationery  | 消しゴム       |  50
+304     | stationery  | 定規           | 120</pre>
+
+			<p style="margin: 0 0 8px 0;"><strong>emps</strong>（従業員管理：10件）</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">emp_id | fname | lname | salary  | dept_no
+-------+-------+-------+---------+--------
+1      | 太郎  | 山田  | 250000  | 10
+2      | 花子  | 佐藤  | 320000  | 20
+3      | 次郎  | 田中  | 280000  | 20
+4      | 梅子  | 伊藤  | 220000  | 40
+5      | 健太  | 渡辺  | 350000  | 10
+6      | 良子  | 小林  | 290000  | 30
+7      | 進    | 加藤  | 310000  | 20
+8      | 光    | 木村  | 240000  | 10
+9      | 恵    | 斎藤  | 270000  | 30
+10     | 隆    | 清水  | 330000  | 20</pre>
+		</div>
+	</section>
+
+	<!-- ===== Cursor への依頼方法 ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			Cursor への具体的な依頼方法（プロンプト例）
+		</h2>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">Cursor のチャット欄に以下のように入力してみてください。</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 10px 0;">「items テーブルを使って、基本問題の3番（合計金額の算出）を解く
+Java プログラムを書いてください。JDBCの4ステップを守り、
+try-with-resources を使ってリソースを適切に閉じてください。」</pre>
+			<p style="margin: 0; font-size: 13px; color: #555;">問題番号・テーブル名・条件を具体的に伝えるほど、意図通りのコードが生成されます。</p>
+		</div>
+	</section>
+
+	<!-- ===== 基本問題10問：items ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			基本問題 10問（items：商品管理）
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0033ff; margin-bottom: 20px;">
+			<p style="margin: 0;"><strong>目標</strong>：ResultSet から値を取り出し、Java で集計・加工する</p>
+		</div>
+
+		<!-- items 問題1 -->
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題1</strong>：全件表示 — 全商品の名前と単価をコンソールに表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT item_name, unit_price FROM items</code> で全件取得し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">while (rs.next())</code> でループしながら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.getString</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.getInt</code> で取り出します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT item_name, unit_price FROM items";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name = rs.getString("item_name");
+		int price   = rs.getInt("unit_price");
+		System.out.println(name + " : " + price + "円");
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 130px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT item_name, unit_price FROM items";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name = rs.getString("item_name");
+		int price   = rs.getInt("unit_price");
+		System.out.println(name + " : " + price + "円");
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題2 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題2</strong>：カテゴリ絞り込み — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'snack'</code> カテゴリの商品名だけを表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE category = ?</code> を追加し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ps.setString(1, "snack")</code> でバインドします。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT item_name FROM items WHERE category = ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setString(1, "snack");
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			System.out.println(rs.getString("item_name"));
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 145px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT item_name FROM items WHERE category = ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setString(1, "snack");
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			System.out.println(rs.getString("item_name"));
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題3 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題3</strong>：合計金額の算出 — 全商品の単価を合計して Java 側で表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">int total = 0;</code> をループの外に用意し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">total += rs.getInt("unit_price")</code> で積み上げます。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT unit_price FROM items";
+int total = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		total += rs.getInt("unit_price");
+	}
+}
+System.out.println("合計：" + total + "円");</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 145px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT unit_price FROM items";
+int total = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		total += rs.getInt("unit_price");
+	}
+}
+System.out.println("合計：" + total + "円");</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題4 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題4</strong>：平均価格の算出 — 全商品の平均価格を計算して表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">合計と件数の両方をループで集め、ループ後に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">total / count</code>（整数除算）または <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">(double)total / count</code> で平均を求めます。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT unit_price FROM items";
+int total = 0;
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		total += rs.getInt("unit_price");
+		count++;
+	}
+}
+if (count > 0) {
+	System.out.println("平均：" + (double) total / count + "円");
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 175px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT unit_price FROM items";
+int total = 0;
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		total += rs.getInt("unit_price");
+		count++;
+	}
+}
+if (count > 0) {
+	System.out.println("平均：" + (double) total / count + "円");
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題5 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題5</strong>：税込み価格計算 — 全商品の単価に消費税10%を加えた価格を Java で計算して表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">int taxed = (int)(price * 1.1);</code> のようにキャストして計算します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT item_name, unit_price FROM items";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name = rs.getString("item_name");
+		int price   = rs.getInt("unit_price");
+		int taxed   = (int)(price * 1.1);
+		System.out.println(name + " 税込：" + taxed + "円");
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 145px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT item_name, unit_price FROM items";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name = rs.getString("item_name");
+		int price   = rs.getInt("unit_price");
+		int taxed   = (int)(price * 1.1);
+		System.out.println(name + " 税込：" + taxed + "円");
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題6 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題6</strong>：最高値の探索 — リストの中で最も高い商品の名前と価格を表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">int maxPrice = 0; String maxName = "";</code> をループ外に持ち、ループ中に比較して更新します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT item_name, unit_price FROM items";
+int maxPrice    = 0;
+String maxName  = "";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		int price = rs.getInt("unit_price");
+		if (price > maxPrice) {
+			maxPrice = price;
+			maxName  = rs.getString("item_name");
+		}
+	}
+}
+System.out.println("最高値：" + maxName + " " + maxPrice + "円");</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 190px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT item_name, unit_price FROM items";
+int maxPrice    = 0;
+String maxName  = "";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		int price = rs.getInt("unit_price");
+		if (price > maxPrice) {
+			maxPrice = price;
+			maxName  = rs.getString("item_name");
+		}
+	}
+}
+System.out.println("最高値：" + maxName + " " + maxPrice + "円");</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題7 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題7</strong>：特定条件のカウント — 150円以上の商品が何個あるかカウントせよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">全件取得して Java 側で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">if (price &gt;= 150) count++;</code> する方法と、SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE unit_price &gt;= 150</code> を付けて件数を数える方法の両方で挑戦してみましょう。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT unit_price FROM items";
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		if (rs.getInt("unit_price") >= 150) {
+			count++;
+		}
+	}
+}
+System.out.println("150円以上：" + count + "件");</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 160px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT unit_price FROM items";
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		if (rs.getInt("unit_price") >= 150) {
+			count++;
+		}
+	}
+}
+System.out.println("150円以上：" + count + "件");</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題8 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題8</strong>：文字列加工 — 商品名を「【新発売】商品名」という形式で加工して表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">Java の文字列連結 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">"【新発売】" + name</code> で加工できます。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT item_name FROM items";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name    = rs.getString("item_name");
+		String labeled = "【新発売】" + name;
+		System.out.println(labeled);
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 130px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT item_name FROM items";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name    = rs.getString("item_name");
+		String labeled = "【新発売】" + name;
+		System.out.println(labeled);
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題9 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題9</strong>：割引シミュレーション — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'stationery'</code> カテゴリの商品をすべて20%引きにした場合の価格を表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">int discounted = (int)(price * 0.8);</code> で計算します。WHERE でカテゴリを絞ってから取得するのが効率的です。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT item_name, unit_price FROM items WHERE category = ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setString(1, "stationery");
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			String name      = rs.getString("item_name");
+			int price        = rs.getInt("unit_price");
+			int discounted   = (int)(price * 0.8);
+			System.out.println(name + " 20%引：" + discounted + "円");
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 175px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT item_name, unit_price FROM items WHERE category = ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setString(1, "stationery");
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			String name      = rs.getString("item_name");
+			int price        = rs.getInt("unit_price");
+			int discounted   = (int)(price * 0.8);
+			System.out.println(name + " 20%引：" + discounted + "円");
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- items 問題10 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題10</strong>：予算内検索 — Java 側で変数 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">limit = 130</code> を定義し、それ以下の価格の商品のみを表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">int limit = 130;</code> を先に定義し、SQL の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE unit_price &lt;= ?</code> に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ps.setInt(1, limit)</code> でバインドします。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">int limit = 130;
+String sql = "SELECT item_name, unit_price FROM items WHERE unit_price <= ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, limit);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			System.out.println(rs.getString("item_name") + " " + rs.getInt("unit_price") + "円");
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 160px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">int limit = 130;
+String sql = "SELECT item_name, unit_price FROM items WHERE unit_price <= ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, limit);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			System.out.println(rs.getString("item_name") + " " + rs.getInt("unit_price") + "円");
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+	</section>
+
+	<!-- ===== 基本問題10問：emps ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			基本問題 10問（emps：従業員管理）
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0033ff; margin-bottom: 20px;">
+			<p style="margin: 0;"><strong>目標</strong>：複数の条件判定や、特定の ID に基づくデータ抽出に慣れる</p>
+		</div>
+
+		<!-- emps 問題1 -->
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題1</strong>：氏名の連結 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">fname</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lname</code> を結合してフルネームで表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">Java 側で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lname + " " + fname</code> のように文字列連結します（姓＋名の順）。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT fname, lname FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String fullName = rs.getString("lname") + " " + rs.getString("fname");
+		System.out.println(fullName);
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 130px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT fname, lname FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String fullName = rs.getString("lname") + " " + rs.getString("fname");
+		System.out.println(fullName);
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題2 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題2</strong>：高給与者の抽出 — 給与（salary）が 300,000 円以上の人の名前を表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE salary &gt;= 300000</code> を追加して絞り込みます。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT fname, lname FROM emps WHERE salary >= 300000";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		System.out.println(rs.getString("lname") + " " + rs.getString("fname"));
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 115px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT fname, lname FROM emps WHERE salary >= 300000";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		System.out.println(rs.getString("lname") + " " + rs.getString("fname"));
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題3 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題3</strong>：部署別カウント — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dept_no</code> が 20 の従業員が何人いるか Java 側でカウントせよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">全件取得して Java の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">if</code> で判定するか、SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE dept_no = 20</code> を付けてループ件数を数えます。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT emp_id FROM emps WHERE dept_no = ?";
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, 20);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			count++;
+		}
+	}
+}
+System.out.println("dept_no=20 の人数：" + count + "人");</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 160px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT emp_id FROM emps WHERE dept_no = ?";
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, 20);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			count++;
+		}
+	}
+}
+System.out.println("dept_no=20 の人数：" + count + "人");</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題4 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題4</strong>：年収計算 — 各従業員の給与を12倍し、推定年収として表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">int annual = salary * 12;</code> で計算します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT fname, lname, salary FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name = rs.getString("lname") + " " + rs.getString("fname");
+		int annual  = rs.getInt("salary") * 12;
+		System.out.println(name + " 推定年収：" + annual + "円");
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 130px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT fname, lname, salary FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name = rs.getString("lname") + " " + rs.getString("fname");
+		int annual  = rs.getInt("salary") * 12;
+		System.out.println(name + " 推定年収：" + annual + "円");
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題5 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題5</strong>：給与平均（特定部署）— <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dept_no</code> が 10 の従業員の平均給与を算出せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">合計と件数を集めてループ後に割り算します。items 問題4と同じパターンです。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT salary FROM emps WHERE dept_no = ?";
+int total = 0;
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, 10);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			total += rs.getInt("salary");
+			count++;
+		}
+	}
+}
+if (count > 0) {
+	System.out.println("dept_no=10 平均給与：" + (double) total / count + "円");
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 190px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT salary FROM emps WHERE dept_no = ?";
+int total = 0;
+int count = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, 10);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			total += rs.getInt("salary");
+			count++;
+		}
+	}
+}
+if (count > 0) {
+	System.out.println("dept_no=10 平均給与：" + (double) total / count + "円");
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題6 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題6</strong>：検索機能の実装 — ID を指定して、その人の名前と給与を1件だけ表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE emp_id = ?</code> で主キー検索します。結果は1件のみなので <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">if (rs.next())</code> で受け取ります。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">int targetId = 3;
+String sql   = "SELECT fname, lname, salary FROM emps WHERE emp_id = ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, targetId);
+	try (ResultSet rs = ps.executeQuery()) {
+		if (rs.next()) {
+			String name = rs.getString("lname") + " " + rs.getString("fname");
+			int salary  = rs.getInt("salary");
+			System.out.println(name + " 給与：" + salary + "円");
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 175px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">int targetId = 3;
+String sql   = "SELECT fname, lname, salary FROM emps WHERE emp_id = ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, targetId);
+	try (ResultSet rs = ps.executeQuery()) {
+		if (rs.next()) {
+			String name = rs.getString("lname") + " " + rs.getString("fname");
+			int salary  = rs.getInt("salary");
+			System.out.println(name + " 給与：" + salary + "円");
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題7 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題7</strong>：昇給シミュレーション — 全員の給与を5%アップさせた場合の、会社全体の総支給額を計算せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">各給与を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">(int)(salary * 1.05)</code> で計算しながら合計します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT salary FROM emps";
+int total = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		total += (int)(rs.getInt("salary") * 1.05);
+	}
+}
+System.out.println("5%昇給後の総支給額：" + total + "円");</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 145px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT salary FROM emps";
+int total = 0;
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		total += (int)(rs.getInt("salary") * 1.05);
+	}
+}
+System.out.println("5%昇給後の総支給額：" + total + "円");</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題8 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題8</strong>：手取り計算 — 給与から一律20%を引いた金額（手取り目安）を算出して表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">(int)(salary * 0.8)</code> で計算します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT fname, lname, salary FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name   = rs.getString("lname") + " " + rs.getString("fname");
+		int takeHome  = (int)(rs.getInt("salary") * 0.8);
+		System.out.println(name + " 手取り：" + takeHome + "円");
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 130px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT fname, lname, salary FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String name   = rs.getString("lname") + " " + rs.getString("fname");
+		int takeHome  = (int)(rs.getInt("salary") * 0.8);
+		System.out.println(name + " 手取り：" + takeHome + "円");
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題9 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題9</strong>：名前の長さチェック — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">fname</code> が3文字以上の従業員のみを抽出して表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">全件取得して Java 側で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">fname.length() >= 3</code> で判定します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT fname, lname FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String fname = rs.getString("fname");
+		if (fname.length() >= 3) {
+			System.out.println(rs.getString("lname") + " " + fname);
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 145px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT fname, lname FROM emps";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql);
+     ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		String fname = rs.getString("fname");
+		if (fname.length() >= 3) {
+			System.out.println(rs.getString("lname") + " " + fname);
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- emps 問題10 -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題10</strong>：部署移動の準備 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dept_no</code> が 20 以外の従業員のリストを作成し、コンソールに表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE dept_no &lt;&gt; 20</code>（または <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">!= 20</code>）を追加します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">String sql = "SELECT fname, lname, dept_no FROM emps WHERE dept_no <> ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, 20);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			System.out.println(rs.getString("lname") + " " + rs.getString("fname")
+				+ " (dept:" + rs.getInt("dept_no") + ")");
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 160px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">String sql = "SELECT fname, lname, dept_no FROM emps WHERE dept_no <> ?";
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, 20);
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			System.out.println(rs.getString("lname") + " " + rs.getString("fname")
+				+ " (dept:" + rs.getInt("dept_no") + ")");
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+	</section>
+
+</div>

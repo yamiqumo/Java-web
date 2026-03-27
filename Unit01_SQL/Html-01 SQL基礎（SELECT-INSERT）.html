@@ -203,25 +203,16 @@ WHERE item_id = 202;</pre>
 		</div>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-2. MySQLに入る（最小）
+			3-2. MySQL への接続と初期データ投入
 		</h3>
 
-		<p style="margin-bottom: 10px;">ローカル環境では、次のようにMySQLに入って操作します。</p>
-
-		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">mysql -u root -p</pre>
-
-		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-3. DBを触る最初の3コマンド
-		</h3>
-
-		<p style="margin-bottom: 10px;">MySQL に入ったあと、まずは「どんなDB・テーブルがあるか」を見るための3つのコマンドです。</p>
-
-		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">SHOW DATABASES;
-USE database_name;
-SHOW TABLES;</pre>
+		<div style="margin: 0; background-color: #f0f8ff; padding: 15px; border-radius: 10px; border-left: 5px solid #0033ff;">
+			<p style="margin: 0 0 6px 0;">MySQL の接続手順・DB選択コマンド・テーブルへのSQL流し込みは、<strong>「環境構築：MySQL のセットアップとDB接続手順」</strong>（Html-env-01）を参照してください。</p>
+			<p style="margin: 0; font-size: 13px; color: #555;">接続コマンド（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql -u root -p</code>）、SHOW DATABASES / USE / SHOW TABLES の使い方、ハンズオン用SQL（items・depts・emps の3テーブル）はそちらに掲載しています。</p>
+		</div>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-4. INSERT / SELECT / UPDATE / DELETE の型（最小）
+			3-3. INSERT / SELECT / UPDATE / DELETE の型（最小）
 		</h3>
 
 		<p style="margin-bottom: 10px;">この回は、次の並びを「同じ順番で」たどれることがゴールです。</p>
@@ -266,7 +257,7 @@ SELECT結果：行数 = ___ 行
 最終の行数：___ 行（増えた？減った？）</pre>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-5. 写経の練習（問題＋解答）
+			3-4. 写経の練習（問題＋解答）
 		</h3>
 
 		<p style="margin-bottom: 15px;">次の日本語をもとに、SQLを書いてみましょう。まず自分で考えてから、ヒントや解答を確認してください。</p>
@@ -274,21 +265,27 @@ SELECT結果：行数 = ___ 行
 		<p style="margin-bottom: 10px;"><strong>最初に流し込むSQL</strong>（テーブル作成＋初期データ）</p>
 		<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 20px;">
 			<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして、手元のツールに貼り付けて実行してください：</p>
-			<textarea readonly style="width: 100%; height: 230px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
+			<textarea readonly style="width: 100%; height: 290px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
 
 CREATE TABLE items (
-	item_id INT NOT NULL,
-	category VARCHAR(30) NOT NULL,
-	item_name VARCHAR(80) NOT NULL,
-	unit_price INT NOT NULL,
+	item_id    INT          NOT NULL,
+	category   VARCHAR(20)  NOT NULL,
+	item_name  VARCHAR(50)  NOT NULL,
+	unit_price INT          NOT NULL,
 	PRIMARY KEY (item_id)
 );
 
-INSERT INTO items (item_id, category, item_name, unit_price) VALUES
-	(101, 'drink', '水', 100),
-	(102, 'drink', 'お茶', 120),
-	(201, 'snack', 'ポテトチップス', 150),
-	(202, 'snack', 'チョコ', 130);
+INSERT INTO items VALUES
+(101, 'drink',      '水',             100),
+(102, 'drink',      'お茶',           120),
+(103, 'drink',      'コーヒー',       150),
+(201, 'snack',      'ポテトチップス', 150),
+(202, 'snack',      'チョコ',         130),
+(203, 'snack',      'せんべい',       110),
+(301, 'stationery', 'ペン',            80),
+(302, 'stationery', 'ノート',         200),
+(303, 'stationery', '消しゴム',        50),
+(304, 'stationery', '定規',           120);
 
 SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;</textarea>
 		</div>
@@ -559,21 +556,27 @@ ORDER BY item_id DESC;</textarea>
 
 		<div style="background:#e6f7ff;padding:15px;border:2px dashed #1890ff;border-radius:6px;">
 			<p style="font-size:12px;color:#0050b3;margin-bottom:8px;font-weight:bold;">この枠のSQLをコピーして、手元のツールに貼り付けて利用できます。</p>
-			<textarea readonly style="width:100%;height:230px;font-family:Consolas,monospace;font-size:13px;padding:10px;border:1px solid #91d5ff;background:#fff;display:block;user-select:all !important;">DROP TABLE IF EXISTS items;
+			<textarea readonly style="width:100%;height:290px;font-family:Consolas,monospace;font-size:13px;padding:10px;border:1px solid #91d5ff;background:#fff;display:block;user-select:all !important;">DROP TABLE IF EXISTS items;
 
 CREATE TABLE items (
-	item_id INT NOT NULL,
-	category VARCHAR(30) NOT NULL,
-	item_name VARCHAR(80) NOT NULL,
-	unit_price INT NOT NULL,
+	item_id    INT          NOT NULL,
+	category   VARCHAR(20)  NOT NULL,
+	item_name  VARCHAR(50)  NOT NULL,
+	unit_price INT          NOT NULL,
 	PRIMARY KEY (item_id)
 );
 
-INSERT INTO items (item_id, category, item_name, unit_price) VALUES
-	(101, 'drink', '水', 100),
-	(102, 'drink', 'お茶', 120),
-	(201, 'snack', 'ポテトチップス', 150),
-	(202, 'snack', 'チョコ', 130);
+INSERT INTO items VALUES
+(101, 'drink',      '水',             100),
+(102, 'drink',      'お茶',           120),
+(103, 'drink',      'コーヒー',       150),
+(201, 'snack',      'ポテトチップス', 150),
+(202, 'snack',      'チョコ',         130),
+(203, 'snack',      'せんべい',       110),
+(301, 'stationery', 'ペン',            80),
+(302, 'stationery', 'ノート',         200),
+(303, 'stationery', '消しゴム',        50),
+(304, 'stationery', '定規',           120);
 
 SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;
 </textarea>

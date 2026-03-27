@@ -1,0 +1,326 @@
+環境構築：MySQL のセットアップとDB接続手順
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		環境構築：MySQL のセットアップとDB接続手順
+	</h1>
+
+	<!-- ===== 0. 今回の環境について ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			0. 今回の環境について
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 10px 0;">この研修では、<strong>MySQL</strong> を利用してデータベースの操作を学びます。</p>
+				<ul style="padding-left: 20px; margin: 0;">
+					<li style="margin-bottom: 8px;">DBMS（データベース管理システム）として <strong>MySQL</strong> を使用します。</li>
+					<li style="margin-bottom: 8px;">接続時のパスワードは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">password</code> としています。<br>
+						<span style="font-size: 13px; color: #888;">※ 本番環境では絶対に使わない弱いパスワードです。今回は研修環境のため、この設定で構築しています。</span>
+					</li>
+					<li style="margin-bottom: 0;">操作はすべて <strong>コマンドプロンプト</strong> から行います。</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===== 1. MySQLのインストール ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			1. MySQL のインストール
+		</h2>
+
+		<!-- 手順1: ダウンロード -->
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 0; margin-bottom: 10px;">
+			手順1：インストーラのダウンロード
+		</h3>
+
+		<div style="margin: 0 0 20px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ol style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 10px;">以下のURLをブラウザで開く。<br>
+					<code style="font-family: monospace; background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 13px;">https://downloads.mysql.com/archives/installer/</code>
+				</li>
+				<li style="margin-bottom: 10px;"><strong>Product Version</strong> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">8.0.43</code>、<strong>Operating System</strong> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Microsoft Windows</code> に合わせる。</li>
+				<li style="margin-bottom: 10px;"><strong>Windows (x86, 32-bit), MSI Installer</strong>（354.3M のフルサイズ版: <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql-installer-community-8.0.43.0.msi</code>）の「Download」をクリックする。<br>
+					<span style="font-size: 13px; color: #888;">※ 上の 2.1M は Web インストーラ（後でダウンロードが走る）です。354.3M のフルサイズ版を選んでください。</span>
+				</li>
+			</ol>
+			<div style="margin: 12px 0 0 0; padding: 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/Unit01_SQL/assets/mysql-download.png" alt="MySQL Product Archives のダウンロード画面（バージョン 8.0.43、Windows 選択済み）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			</div>
+		</div>
+
+		<!-- 手順2: インストール実行 -->
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			手順2：インストーラの実行
+		</h3>
+
+		<div style="margin: 0 0 20px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ol style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 8px;">ダウンロードした <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql-installer-community-8.0.43.0.msi</code> をダブルクリックして起動する。</li>
+				<li style="margin-bottom: 8px;">「Choosing a Setup Type」画面で <strong>Full</strong> を選択する。<br>
+					<span style="font-size: 13px; color: #888;">（MySQL Server・Workbench・JDBC ドライバなどが一括でインストールされます）</span>
+				</li>
+				<li style="margin-bottom: 0;">以降は「Next」または「Execute」をクリックして進める（次の手順3で注意箇所があります）。</li>
+			</ol>
+		</div>
+
+		<!-- 手順3: Authentication Method -->
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			手順3：Authentication Method の設定（重要）
+		</h3>
+
+		<div style="margin: 0 0 20px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<div style="background-color: #fff3f3; border-left: 4px solid #cc0000; padding: 10px 15px; border-radius: 4px; margin-bottom: 15px;">
+				<p style="margin: 0; font-size: 14px; color: #cc0000;"><strong>ここだけ注意！</strong> デフォルトのまま「Next」を押すと JDBC 接続でエラーになります。必ず下記の手順で設定を変更してください。</p>
+			</div>
+			<ol style="padding-left: 20px; margin: 0 0 15px 0;">
+				<li style="margin-bottom: 10px;">「Authentication Method」画面が表示されたら、<strong>Use Legacy Authentication Method (Retain MySQL 5.x Compatibility)</strong> を選択する。</li>
+				<li style="margin-bottom: 10px;">「Next」をクリックして進む。</li>
+				<li style="margin-bottom: 10px;">「Accounts and Roles」画面で <strong>root パスワード</strong> に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">password</code> を入力する。<br>
+					<span style="font-size: 13px; color: #888;">※ 研修環境用の設定です。本番では使わないパスワードです。</span>
+				</li>
+				<li style="margin-bottom: 0;">その後は「Next」→「Execute」→「Finish」で完了。</li>
+			</ol>
+			<div style="padding: 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/Unit01_SQL/assets/LegacyAuth.png" alt="Authentication Method 画面で Use Legacy Authentication Method を選択している様子" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			</div>
+		</div>
+
+		<!-- 手順4: Windows PATH 登録 -->
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			手順4：Windows PATH への登録
+		</h3>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">インストール後、コマンドプロンプトから <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql</code> コマンドを実行できるよう、実行ファイルのパスを Windows に登録します。</p>
+			<ol style="padding-left: 20px; margin: 0 0 15px 0;">
+				<li style="margin-bottom: 8px;">スタートボタンを<strong>右クリック</strong>して「検索」を開き、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">システム環境変数の編集</code> と入力して開く。</li>
+				<li style="margin-bottom: 8px;">「システムのプロパティ」が開いたら <strong>「環境変数」</strong> をクリック。</li>
+				<li style="margin-bottom: 8px;">「システム環境変数」欄の <strong>「Path」</strong> を選択して <strong>「編集」</strong> をクリック。</li>
+				<li style="margin-bottom: 8px;">「新規」をクリックし、以下のパスを入力する。</li>
+			</ol>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 15px 0;">C:\Program Files\MySQL\MySQL Server 8.0\bin</pre>
+			<ol style="padding-left: 20px; margin: 0 0 15px 0;" start="5">
+				<li style="margin-bottom: 8px;">「OK」→「OK」→「OK」で閉じる。</li>
+				<li style="margin-bottom: 0;"><strong>新しいコマンドプロンプト</strong>を開いて（既に開いているものは閉じてから）、以下を実行して確認する。</li>
+			</ol>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 10px 0;">mysql --version</pre>
+			<div style="background-color: #f0f8ff; padding: 10px 15px; border-radius: 6px; border-left: 4px solid #0033ff;">
+				<p style="margin: 0; font-size: 13px;">以下のように表示されれば登録成功です。</p>
+				<pre style="background-color: #fff; color: #333; padding: 8px; border-radius: 4px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 8px 0 0 0;">mysql  Ver 8.0.43 Distrib 8.0.43, for Win64 (x86_64)</pre>
+			</div>
+		</div>
+	</section>
+
+	<!-- ===== 2. DBの立ち上げ方法（コマンドプロンプト） ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			2. DB の立ち上げ方法（コマンドプロンプト）
+		</h2>
+
+		<p style="margin-bottom: 10px;">コマンドプロンプトを開き、次のコマンドで MySQL に接続します。</p>
+
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 15px;">mysql -u root -p</pre>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 8px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">-u root</code>：ユーザー名を <strong>root</strong> で接続する指定。</li>
+				<li style="margin-bottom: 8px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">-p</code>：パスワードを入力するよう求めるオプション。実行後にパスワード（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">password</code>）を入力する。</li>
+				<li style="margin-bottom: 0;">接続が成功すると <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql&gt;</code> というプロンプトが表示される。</li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- ===== 3. 現状のDB一覧・テーブル一覧の確認 ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			3. 現状の確認コマンド（DB一覧・テーブル一覧）
+		</h2>
+
+		<p style="margin-bottom: 10px;">MySQL に入ったあと、まず「今どんな DB やテーブルがあるか」を確認する3つのコマンドを覚えましょう。</p>
+
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 15px;">-- 存在するDB（データベース）の一覧を表示
+SHOW DATABASES;
+
+-- 利用するDBを指定する
+USE データベース名;
+
+-- 指定したDB内にあるテーブルの一覧を表示
+SHOW TABLES;</pre>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 8px;"><strong>SHOW DATABASES</strong>：現在MySQLに存在するDB（データベース）の一覧が表示される。</li>
+				<li style="margin-bottom: 8px;"><strong>USE データベース名</strong>：これ以降の操作をどのDBに対して行うかを指定する。</li>
+				<li style="margin-bottom: 0;"><strong>SHOW TABLES</strong>：USE で選択したDB内のテーブル一覧が表示される。</li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- ===== 4. 利用するDBを指定する ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			4. 利用する DB を指定する方法
+		</h2>
+
+		<p style="margin-bottom: 10px;">テーブルを作ったりデータを入れたりする前に、必ず <strong>USE</strong> でDBを選択します。選択しないまま操作しようとするとエラーになります（後述のエラーを参照）。</p>
+
+		<p style="margin-bottom: 8px;">この研修では <strong>training</strong> という名前のDBを使用します。</p>
+
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 15px;">-- DB が存在しない場合は先に作成する
+CREATE DATABASE training;
+
+-- 利用するDBを指定する
+USE training;
+
+-- 選択できたか確認（現在のDB名が表示される）
+SELECT DATABASE();</pre>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0;"><strong>ポイント</strong>：SQL を実行するたびに接続先のDBが記憶されているので、一度 USE すれば以降は同じセッション中ずっと有効です。</p>
+			<p style="margin: 0;">MySQL を再起動したり、別のコマンドプロンプトで接続し直したりすると、再度 USE が必要になります。</p>
+		</div>
+	</section>
+
+	<!-- ===== 5. ハンズオン用SQL流し込み ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			5. ハンズオン（写経）で利用する DB の流し込み
+		</h2>
+
+		<p style="margin-bottom: 10px;">以下のSQLをコピーして、MySQL のプロンプト（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql&gt;</code>）に貼り付けて実行してください。<br>
+			<strong>事前に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE training;</code> で DB を選択しておくこと。</strong>
+		</p>
+
+		<p style="margin-bottom: 5px; font-weight: bold; color: #0033ff;">items テーブル（商品管理：単一テーブル学習用）</p>
+		<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 20px;">
+			<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして貼り付けて実行してください：</p>
+			<textarea readonly style="width: 100%; height: 240px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
+
+CREATE TABLE items (
+	item_id    INT          NOT NULL,
+	category   VARCHAR(20)  NOT NULL,
+	item_name  VARCHAR(50)  NOT NULL,
+	unit_price INT          NOT NULL,
+	PRIMARY KEY (item_id)
+);
+
+INSERT INTO items VALUES
+(101, 'drink',      '水',             100),
+(102, 'drink',      'お茶',           120),
+(103, 'drink',      'コーヒー',       150),
+(201, 'snack',      'ポテトチップス', 150),
+(202, 'snack',      'チョコ',         130),
+(203, 'snack',      'せんべい',       110),
+(301, 'stationery', 'ペン',            80),
+(302, 'stationery', 'ノート',         200),
+(303, 'stationery', '消しゴム',        50),
+(304, 'stationery', '定規',           120);
+
+SELECT * FROM items ORDER BY item_id;</textarea>
+		</div>
+
+		<p style="margin-bottom: 5px; font-weight: bold; color: #0033ff;">depts / emps テーブル（部署・従業員管理：関連学習用）</p>
+		<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 20px;">
+			<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして貼り付けて実行してください：</p>
+			<textarea readonly style="width: 100%; height: 370px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS emps;
+DROP TABLE IF EXISTS depts;
+
+CREATE TABLE depts (
+	dept_no   INT          NOT NULL,
+	dept_name VARCHAR(20)  NOT NULL,
+	area      VARCHAR(20)  NOT NULL,
+	PRIMARY KEY (dept_no)
+);
+
+CREATE TABLE emps (
+	emp_id  INT          NOT NULL,
+	fname   VARCHAR(20)  NOT NULL,
+	lname   VARCHAR(20)  NOT NULL,
+	salary  INT          NOT NULL,
+	dept_no INT          NOT NULL,
+	PRIMARY KEY (emp_id)
+);
+
+INSERT INTO depts VALUES
+(10, '営業部', '東京'),
+(20, '開発部', '大阪'),
+(30, '人事部', '名古屋'),
+(40, '総務部', '福岡');
+
+INSERT INTO emps VALUES
+( 1, '太郎', '山田', 250000, 10),
+( 2, '花子', '佐藤', 320000, 20),
+( 3, '次郎', '田中', 280000, 20),
+( 4, '梅子', '伊藤', 220000, 40),
+( 5, '健太', '渡辺', 350000, 10),
+( 6, '良子', '小林', 290000, 30),
+( 7, '進',   '加藤', 310000, 20),
+( 8, '光',   '木村', 240000, 10),
+( 9, '恵',   '斎藤', 270000, 30),
+(10, '隆',   '清水', 330000, 20);
+
+SELECT * FROM depts ORDER BY dept_no;
+SELECT * FROM emps ORDER BY emp_id;</textarea>
+		</div>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0;"><strong>流し込み完了の目安</strong></p>
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 6px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Query OK, 10 rows affected</code> のようにメッセージが出れば成功。</li>
+				<li style="margin-bottom: 6px;">最後の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT</code> 結果でテーブルのデータが表示されれば確認完了。</li>
+				<li style="margin-bottom: 0;">エラーが出た場合は次のセクションを参照してください。</li>
+			</ul>
+		</div>
+	</section>
+
+	<!-- ===== 6. エラーの見方と対処方法 ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			6. エラーの見方と対処方法
+		</h2>
+
+		<p style="margin-bottom: 15px;">よく遭遇するメッセージを確認しておきましょう。</p>
+
+		<div style="background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px; padding: 10px 15px; margin-bottom: 10px;">
+			<details style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #cc0000;">ERROR 1046 (3D000): No database selected</summary>
+				<div style="margin: 10px 0 5px 15px;">
+					<p style="margin: 0 0 8px 0;"><strong>意味</strong>：操作対象のDBが選択されていない。</p>
+					<p style="margin: 0 0 8px 0;"><strong>原因</strong>：MySQL に接続してすぐ USE を実行せずにテーブル操作を行おうとした。</p>
+					<p style="margin: 0 0 8px 0;"><strong>対処</strong>：先に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE training;</code> を実行してから、もう一度やり直す。</p>
+					<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">USE training;   -- これを先に実行してから操作を続ける</pre>
+				</div>
+			</details>
+		</div>
+
+		<div style="background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px; padding: 10px 15px; margin-bottom: 10px;">
+			<details style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">Query OK, 1 row affected</summary>
+				<div style="margin: 10px 0 5px 15px;">
+					<p style="margin: 0 0 8px 0;"><strong>意味</strong>：正常にSQLが実行された。</p>
+					<p style="margin: 0 0 8px 0;"><strong>内容</strong>：「1行が処理された（INSERT / UPDATE / DELETE など）」という成功メッセージ。数字は処理された行数を表す。</p>
+					<ul style="padding-left: 20px; margin: 0;">
+						<li style="margin-bottom: 4px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Query OK, 1 row affected</code>：1件のINSERT / UPDATE / DELETE が成功した。</li>
+						<li style="margin-bottom: 4px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Query OK, 10 rows affected</code>：10件まとめて処理が成功した（INSERT などのまとめ実行）。</li>
+						<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Query OK, 0 rows affected</code>：条件に一致する行がなかった（WHEREの値が存在しないなど）。エラーではないが注意が必要。</li>
+					</ul>
+				</div>
+			</details>
+		</div>
+
+		<div style="background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px; padding: 10px 15px;">
+			<details style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #cc0000;">ERROR 1062 (23000): Duplicate entry ... for key 'PRIMARY'</summary>
+				<div style="margin: 10px 0 5px 15px;">
+					<p style="margin: 0 0 8px 0;"><strong>意味</strong>：主キーが重複している。</p>
+					<p style="margin: 0 0 8px 0;"><strong>原因</strong>：同じ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_id</code> や <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id</code> を2回 INSERT しようとした。</p>
+					<p style="margin: 0;"><strong>対処</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DROP TABLE IF EXISTS テーブル名;</code> でテーブルごと削除してから、流し込みSQLを最初から実行し直す。</p>
+				</div>
+			</details>
+		</div>
+	</section>
+
+</div>
