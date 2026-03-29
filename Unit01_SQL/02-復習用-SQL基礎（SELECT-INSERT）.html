@@ -7,6 +7,50 @@
 
 	<p style="margin: 0 0 18px 0;">このページは<strong>復習・予習専用</strong>です。講義の本編は <strong>Html-01 SQL基礎（SELECT-INSERT）.html</strong> を参照してください。次の Lesson（Unit 2）の冒頭で理解度を確認する想定で、自分のペースで繰り返し使えます。</p>
 
+	<!-- ===== 事前準備：DB選択＋テーブル初期化 ===== -->
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			事前準備：DB選択とサンプルデータの用意
+		</h2>
+		<div style="padding: 14px 16px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0;"><strong>演習を始める前に、必ず次の手順を完了してください。</strong></p>
+			<ol style="padding-left: 20px; margin: 0 0 14px 0;">
+				<li style="margin-bottom: 8px;">MySQL に接続する（環境未構築の場合は <strong>00-環境-環境構築（MySQL）.html</strong> を先に確認）。</li>
+				<li style="margin-bottom: 8px;"><strong><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE lesson;</code> で第1回用データベース <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lesson</code> を選択する。</strong>（Workbench・CLI いずれも同様。MySQL を再起動した場合は再度実行が必要です。）</li>
+				<li style="margin-bottom: 0;">下のSQLをコピーしてツールに貼り付け、<strong>一括実行</strong>する。第1回は<strong>環境構築・本編テキストと同じ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">items</code> テーブル（10件）</strong>だけを使います。</li>
+			</ol>
+			<p style="margin: 0 0 12px 0; font-size: 12px; color: #666;">ブロック4で INSERT / UPDATE / DELETE を試したあと結果が想定と違うときは、<strong>この事前準備のSQLを再実行</strong>して初期状態に戻してからやり直してください。</p>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして、手元のツールに貼り付けて実行してください：</p>
+				<textarea readonly style="width: 100%; height: 290px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">USE lesson;
+
+DROP TABLE IF EXISTS items;
+
+CREATE TABLE items (
+	item_id    INT          NOT NULL,
+	category   VARCHAR(20)  NOT NULL,
+	item_name  VARCHAR(50)  NOT NULL,
+	unit_price INT          NOT NULL,
+	PRIMARY KEY (item_id)
+);
+
+INSERT INTO items VALUES
+(101, 'drink',      '水',             100),
+(102, 'drink',      'お茶',           120),
+(103, 'drink',      'コーヒー',       150),
+(201, 'snack',      'ポテトチップス', 150),
+(202, 'snack',      'チョコ',         130),
+(203, 'snack',      'せんべい',       110),
+(301, 'stationery', 'ペン',            80),
+(302, 'stationery', 'ノート',         200),
+(303, 'stationery', '消しゴム',        50),
+(304, 'stationery', '定規',           120);
+
+SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;</textarea>
+			</div>
+		</div>
+	</section>
+
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
 			自習：動画 → やる → 振り返り
@@ -90,7 +134,7 @@ FROM items;</textarea>
 			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：下の問題を解いてから、ヒント・解答例を確認してください。</p>
 
 			<!-- 問題2-1 -->
-			<p style="margin: 10px 0 5px 0;"><strong>問題3</strong>：category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'drink'</code> の商品をすべてのカラムで表示するSQLを書いてください。</p>
+			<p style="margin: 10px 0 5px 0;"><strong>問題3</strong>：itemsテーブルから category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'drink'</code> の商品をすべてのカラムで表示するSQLを書いてください。</p>
 			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
 			<details style="margin-top: 8px;">
 				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
@@ -114,7 +158,7 @@ WHERE category = 'drink';</textarea>
 			</details>
 
 			<!-- 問題2-2 -->
-			<p style="margin: 20px 0 5px 0;"><strong>問題4</strong>：unit_price が 120 以上の商品の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code> を表示するSQLを書いてください。</p>
+			<p style="margin: 20px 0 5px 0;"><strong>問題4</strong>：itemsテーブルから unit_price が 120 以上の商品の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code> を表示するSQLを書いてください。</p>
 			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
 			<details style="margin-top: 8px;">
 				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
@@ -222,32 +266,11 @@ ORDER BY unit_price ASC;</textarea>
 			<iframe src="https://www.youtube.com/embed/BHfzp1rh2sk?start=0&amp;rel=0&amp;enablejsapi=1" name="block4_player" width="560" height="315" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen" style="max-width: 100%; display: block; margin-bottom: 8px;"></iframe>
 			<p style="margin: 0 0 14px 0;"><a href="https://www.youtube.com/embed/BHfzp1rh2sk?start=0&amp;autoplay=1" target="block4_player" style="text-decoration: none; background: #0033ff; color: white; padding: 10px 20px; border-radius: 5px; font-size: 14px; display: inline-block;">再生する（0:00〜）</a></p>
 
-			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：初期データを実行してから、下の問題に取り組んでください。</p>
-
-			<p style="margin: 8px 0 6px 0; font-weight: bold; font-size: 13px;">最初に流し込むSQL（テーブル作成＋初期データ）</p>
-			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 16px;">
-				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして、手元のツールに貼り付けて実行してください：</p>
-				<textarea readonly style="width: 100%; height: 200px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
-
-CREATE TABLE items (
-	item_id INT NOT NULL,
-	category VARCHAR(30) NOT NULL,
-	item_name VARCHAR(80) NOT NULL,
-	unit_price INT NOT NULL,
-	PRIMARY KEY (item_id)
-);
-
-INSERT INTO items (item_id, category, item_name, unit_price) VALUES
-	(101, 'drink', '水', 100),
-	(102, 'drink', 'お茶', 120),
-	(201, 'snack', 'ポテトチップス', 150),
-	(202, 'snack', 'チョコ', 130);
-
-SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;</textarea>
-			</div>
+			<p style="margin: 0 0 8px 0;"><strong>やる</strong>：<strong>ページ先頭の「事前準備」でサンプルデータを実行済みであることを確認してから</strong>、下の問題に取り組んでください。まだ実行していない場合はページ先頭に戻って実行してください。</p>
+			<p style="margin: 0 0 12px 0; font-size: 12px; color: #666;">問題7で行を足したあと問題9で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">202</code> 行を消す、という流れになります。途中の結果が分かりづらいときは、<strong>事前準備のSQLを再実行</strong>してから問題7からやり直してください。</p>
 
 			<!-- 問題4-1 -->
-			<p style="margin: 10px 0 5px 0;"><strong>問題7</strong>：item_id が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">303</code>、category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'drink'</code>、item_name が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'サンプル飲料'</code>、unit_price が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">140</code> の商品を追加し、その後 SELECT で一覧を確認するSQLを書いてください。</p>
+			<p style="margin: 10px 0 5px 0;"><strong>問題7</strong>：item_id が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">305</code>、category が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'drink'</code>、item_name が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">'サンプル飲料'</code>、unit_price が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">140</code> の商品を追加し、その後 SELECT で一覧を確認するSQLを書いてください。</p>
 			<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
 			<details style="margin-top: 8px;">
 				<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
@@ -260,7 +283,7 @@ SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;</te
 				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
 					<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">-- INSERT（行を追加）
 INSERT INTO items (item_id, category, item_name, unit_price)
-VALUES (303, 'drink', 'サンプル飲料', 140);
+VALUES (305, 'drink', 'サンプル飲料', 140);
 
 -- SELECT で確認（増えたか？）
 SELECT item_id, category, item_name, unit_price
@@ -270,7 +293,7 @@ ORDER BY item_id;</pre>
 						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
 						<textarea readonly style="width: 100%; height: 155px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">-- INSERT（行を追加）
 INSERT INTO items (item_id, category, item_name, unit_price)
-VALUES (303, 'drink', 'サンプル飲料', 140);
+VALUES (305, 'drink', 'サンプル飲料', 140);
 
 -- SELECT で確認（増えたか？）
 SELECT item_id, category, item_name, unit_price

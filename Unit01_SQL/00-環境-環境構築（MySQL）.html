@@ -38,9 +38,11 @@
 
 		<div style="margin: 0 0 20px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<ol style="padding-left: 20px; margin: 0;">
-				<li style="margin-bottom: 10px;">以下のURLをブラウザで開く。<br>
-					<code style="font-family: monospace; background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 13px;">https://downloads.mysql.com/archives/installer/</code>
-				</li>
+        <li style="margin-bottom: 10px;">以下のURLをブラウザで開く。<br>
+          <a href="https://downloads.mysql.com/archives/installer/" target="_blank" rel="noopener noreferrer" style="font-family: monospace; background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 13px; color: #0056b3; text-decoration: underline;">
+            https://downloads.mysql.com/archives/installer/
+          </a>
+        </li>
 				<li style="margin-bottom: 10px;"><strong>Product Version</strong> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">8.0.43</code>、<strong>Operating System</strong> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Microsoft Windows</code> に合わせる。</li>
 				<li style="margin-bottom: 10px;"><strong>Windows (x86, 32-bit), MSI Installer</strong>（354.3M のフルサイズ版: <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql-installer-community-8.0.43.0.msi</code>）の「Download」をクリックする。<br>
 					<span style="font-size: 13px; color: #888;">※ 上の 2.1M は Web インストーラ（後でダウンロードが走る）です。354.3M のフルサイズ版を選んでください。</span>
@@ -167,13 +169,13 @@ SHOW TABLES;</pre>
 
 		<p style="margin-bottom: 10px;">テーブルを作ったりデータを入れたりする前に、必ず <strong>USE</strong> でDBを選択します。選択しないまま操作しようとするとエラーになります（後述のエラーを参照）。</p>
 
-		<p style="margin-bottom: 8px;">この研修では <strong>training</strong> という名前のDBを使用します。</p>
+		<p style="margin-bottom: 8px;">この研修では <strong>lesson</strong> という名前のDBを使用します。</p>
 
 		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 15px;">-- DB が存在しない場合は先に作成する
-CREATE DATABASE training;
+CREATE DATABASE lesson;
 
 -- 利用するDBを指定する
-USE training;
+USE lesson;
 
 -- 選択できたか確認（現在のDB名が表示される）
 SELECT DATABASE();</pre>
@@ -191,13 +193,14 @@ SELECT DATABASE();</pre>
 		</h2>
 
 		<p style="margin-bottom: 10px;">以下のSQLをコピーして、MySQL のプロンプト（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql&gt;</code>）に貼り付けて実行してください。<br>
-			<strong>事前に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE training;</code> で DB を選択しておくこと。</strong>
+			<strong>事前に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE lesson;</code> で DB を選択しておくこと。</strong>
 		</p>
 
 		<p style="margin-bottom: 5px; font-weight: bold; color: #0033ff;">items テーブル（商品管理：単一テーブル学習用）</p>
+		<p style="margin: 0 0 10px 0; font-size: 13px; color: #555;">第1回（SQL基礎のテキスト・復習ページ）でも<strong>同じ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">items</code> テーブル</strong>を使います。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lesson</code> DB を選んだうえで、下のSQLで作成・初期化してください。</p>
 		<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 20px;">
 			<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして貼り付けて実行してください：</p>
-			<textarea readonly style="width: 100%; height: 240px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
+			<textarea readonly style="width: 100%; height: 290px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS items;
 
 CREATE TABLE items (
 	item_id    INT          NOT NULL,
@@ -219,51 +222,54 @@ INSERT INTO items VALUES
 (303, 'stationery', '消しゴム',        50),
 (304, 'stationery', '定規',           120);
 
-SELECT * FROM items ORDER BY item_id;</textarea>
+SELECT item_id, category, item_name, unit_price FROM items ORDER BY item_id;
+</textarea>
 		</div>
 
 		<p style="margin-bottom: 5px; font-weight: bold; color: #0033ff;">depts / emps テーブル（部署・従業員管理：関連学習用）</p>
 		<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px; margin-bottom: 20px;">
 			<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">この枠のSQLをコピーして貼り付けて実行してください：</p>
-			<textarea readonly style="width: 100%; height: 370px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">DROP TABLE IF EXISTS emps;
-DROP TABLE IF EXISTS depts;
-
-CREATE TABLE depts (
-	dept_no   INT          NOT NULL,
-	dept_name VARCHAR(20)  NOT NULL,
-	area      VARCHAR(20)  NOT NULL,
-	PRIMARY KEY (dept_no)
-);
-
-CREATE TABLE emps (
-	emp_id  INT          NOT NULL,
-	fname   VARCHAR(20)  NOT NULL,
-	lname   VARCHAR(20)  NOT NULL,
-	salary  INT          NOT NULL,
-	dept_no INT          NOT NULL,
-	PRIMARY KEY (emp_id)
-);
-
-INSERT INTO depts VALUES
-(10, '営業部', '東京'),
-(20, '開発部', '大阪'),
-(30, '人事部', '名古屋'),
-(40, '総務部', '福岡');
-
-INSERT INTO emps VALUES
-( 1, '太郎', '山田', 250000, 10),
-( 2, '花子', '佐藤', 320000, 20),
-( 3, '次郎', '田中', 280000, 20),
-( 4, '梅子', '伊藤', 220000, 40),
-( 5, '健太', '渡辺', 350000, 10),
-( 6, '良子', '小林', 290000, 30),
-( 7, '進',   '加藤', 310000, 20),
-( 8, '光',   '木村', 240000, 10),
-( 9, '恵',   '斎藤', 270000, 30),
-(10, '隆',   '清水', 330000, 20);
-
-SELECT * FROM depts ORDER BY dept_no;
-SELECT * FROM emps ORDER BY emp_id;</textarea>
+			<textarea readonly style="width: 100%; height: 370px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">
+  DROP TABLE IF EXISTS emps;
+  DROP TABLE IF EXISTS depts;
+  
+  CREATE TABLE depts (
+    dept_no   INT          NOT NULL,
+    dept_name VARCHAR(20)  NOT NULL,
+    area       VARCHAR(20)  NOT NULL,
+    PRIMARY KEY (dept_no)
+  );
+  
+  CREATE TABLE emps (
+    emp_id  INT          NOT NULL,
+    fname   VARCHAR(20)  NOT NULL, -- 苗字として使用
+    lname   VARCHAR(20)  NOT NULL, -- 名前として使用
+    salary  INT          NOT NULL,
+    dept_no INT          NOT NULL,
+    PRIMARY KEY (emp_id)
+  );
+  
+  INSERT INTO depts VALUES
+  (10, '営業部', '東京'),
+  (20, '開発部', '大阪'),
+  (30, '人事部', '名古屋'),
+  (40, '総務部', '福岡');
+  
+  INSERT INTO emps VALUES
+  ( 1, '山田', '太郎', 250000, 10),
+  ( 2, '佐藤', '花子', 320000, 20),
+  ( 3, '田中', '次郎', 280000, 20),
+  ( 4, '伊藤', '梅子', 220000, 40),
+  ( 5, '渡辺', '健太', 350000, 10),
+  ( 6, '小林', '良子', 290000, 30),
+  ( 7, '加藤', '進',   310000, 20),
+  ( 8, '木村', '光',   240000, 10),
+  ( 9, '斎藤', '恵',   270000, 30),
+  (10, '清水', '隆',   330000, 20);
+  
+  SELECT * FROM depts ORDER BY dept_no;
+  SELECT * FROM emps ORDER BY emp_id;
+</textarea>
 		</div>
 
 		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -290,8 +296,8 @@ SELECT * FROM emps ORDER BY emp_id;</textarea>
 				<div style="margin: 10px 0 5px 15px;">
 					<p style="margin: 0 0 8px 0;"><strong>意味</strong>：操作対象のDBが選択されていない。</p>
 					<p style="margin: 0 0 8px 0;"><strong>原因</strong>：MySQL に接続してすぐ USE を実行せずにテーブル操作を行おうとした。</p>
-					<p style="margin: 0 0 8px 0;"><strong>対処</strong>：先に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE training;</code> を実行してから、もう一度やり直す。</p>
-					<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">USE training;   -- これを先に実行してから操作を続ける</pre>
+					<p style="margin: 0 0 8px 0;"><strong>対処</strong>：先に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE lesson;</code> を実行してから、もう一度やり直す。</p>
+					<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">USE lesson;   -- これを先に実行してから操作を続ける</pre>
 				</div>
 			</details>
 		</div>
