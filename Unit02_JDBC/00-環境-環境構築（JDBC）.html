@@ -1,0 +1,136 @@
+環境構築：JDBC（MySQL Connector/J）を追加して接続確認
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		環境構築：JDBC（MySQL Connector/J）を追加して接続確認
+	</h1>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			0. ここでやること（最短ルート）
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 10px 0;">このページは、<strong>Java から MySQL に接続できる状態</strong>を作るための手順です。</p>
+				<ul style="padding-left: 20px; margin: 0;">
+					<li style="margin-bottom: 8px;"><strong>mysql-connector-j-8.0.33.jar</strong> を入手する（learningBOX）。</li>
+					<li style="margin-bottom: 8px;">Eclipse の <strong>ビルドパス</strong>に外部JARとして追加する。</li>
+					<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SampleConnection.java</code> を実行し、接続だけ成功することを確認する。</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			1. JAR をダウンロード（learningBOX）
+		</h2>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ol style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 10px;">以下のリンクを開いて learningBOX にログインする。</li>
+				<li style="margin-bottom: 10px;">添付から <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql-connector-j-8.0.33.jar</code> をダウンロードする。</li>
+				<li style="margin-bottom: 0;">ダウンロード先（例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Downloads/</code>）を確認する。</li>
+			</ol>
+
+			<div style="margin: 12px 0 0 0;">
+				<a href="https://lms.learningbox.online/sys/?action=quizPlayer&amp;options=eyJzY29faWQiOiI4MzM2MzkwIiwiYmFja19saXN0Ijp0cnVlLCJoZWFkZXIiOnsiZ29vZCI6eyJ2aXNpYmxlIjp0cnVlfX0sImZyb21fY291cnNlIjp0cnVlfSwiZnJvbV9jb3Vyc2VfaWQiOiI4MTkzMDEyIn0%3D" target="_blank" rel="noopener noreferrer" style="font-family: monospace; background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 13px; color: #0056b3; text-decoration: underline;">
+					learningBOX（添付DL）
+				</a>
+			</div>
+		</div>
+
+		<div style="margin-top: 15px; background-color: #fafafa; border: 1px solid #e1dbbd; border-radius: 10px; padding: 15px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">コラム：MySQL公式アーカイブからのDLも可（参考）</p>
+			<p style="margin: 0 0 10px 0;">learningBOX が開けない場合などは、MySQL公式のアーカイブからも入手できます。</p>
+			<ul style="padding-left: 20px; margin: 0 0 10px 0;">
+				<li style="margin-bottom: 10px;">
+					<a href="https://downloads.mysql.com/archives/c-j/" target="_blank" rel="noopener noreferrer" style="font-family: monospace; background-color: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-size: 13px; color: #0056b3; text-decoration: underline;">
+						https://downloads.mysql.com/archives/c-j/
+					</a>
+				</li>
+				<li style="margin-bottom: 6px;"><strong>Product Version</strong> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">8.0.33</code>。</li>
+				<li style="margin-bottom: 6px;"><strong>Operating System</strong> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Platform Independent</code>。</li>
+				<li style="margin-bottom: 0;">ZIP をDL → 展開 → <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql-connector-j-8.0.33.jar</code> を取り出す。</li>
+			</ul>
+			<div style="padding: 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/mysqlConncetor-8.0.33-DL.png" alt="MySQL Connector/J (Archived Versions) から 8.0.33 を選んでダウンロードする画面" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			2. Eclipse に外部JARを追加（ビルドパス）
+		</h2>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ol style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 10px;">Javaプロジェクトを右クリック。</li>
+				<li style="margin-bottom: 10px;"><strong>ビルド・パス</strong> → <strong>ビルド・パスの構成</strong>。</li>
+				<li style="margin-bottom: 10px;">上のタブを <strong>ライブラリー</strong> にする。</li>
+				<li style="margin-bottom: 0;"><strong>外部JARの追加</strong> から <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">mysql-connector-j-8.0.33.jar</code> を追加 → 適用。</li>
+			</ol>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			3. 接続確認（SampleConnection を実行）
+		</h2>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">次の最小プログラムを <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">src</code> 配下に作成して実行します（try-with-resources で接続を自動的に閉じます）。</p>
+			<p style="margin: 0 0 10px 0;">ファイルは既に用意してあります：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit02_JDBC/src/SampleConnection.java</code></p>
+
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+				<textarea readonly style="width: 100%; height: 330px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class SampleConnection {
+
+	// TODO: 自分の環境に合わせて修正
+	private static final String URL = \"jdbc:mysql://localhost:3306/your_database?useSSL=false&amp;serverTimezone=Asia/Tokyo\";
+	private static final String USER = \"root\";
+	private static final String PASS = \"your_password\";
+
+	public static void main(String[] args) {
+		try {
+			Class.forName(\"com.mysql.cj.jdbc.Driver\");
+		} catch (ClassNotFoundException e) {
+			System.err.println(\"MySQL ドライバが見つかりません。ビルドパスにコネクタJARを追加してください。\");
+			e.printStackTrace();
+			return;
+		}
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS)) {
+			System.out.println(\"接続に成功しました。\");
+		} catch (SQLException e) {
+			System.err.println(\"接続に失敗しました: \" + e.getMessage());
+			e.printStackTrace();
+		}
+	}
+}</textarea>
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			4. よくあるエラー（最小）
+		</h2>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 8px;"><strong>MySQL ドライバが見つからない（ClassNotFoundException）</strong>：JAR がビルドパスに入っていない。</li>
+				<li style="margin-bottom: 8px;"><strong>Access denied</strong>：USER/PASS が違う。</li>
+				<li style="margin-bottom: 8px;"><strong>Unknown database</strong>：DB名が違う。</li>
+				<li style="margin-bottom: 0;"><strong>Communications link failure</strong>：ホスト/ポート、MySQL 起動状態を確認。</li>
+			</ul>
+		</div>
+	</section>
+
+</div>
