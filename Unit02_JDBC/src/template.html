@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>第2回：JDBC接続の基本〜JavaからDBへ「橋」をかける〜</title>
-<link rel="stylesheet" href="../assets/pdf-a4.css">
+<link rel="stylesheet" href="../../assets/pdf-a4.css">
 </head>
 <body>
 <div style="max-width: 100%; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
@@ -14,13 +14,18 @@
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			1. 本日の内容の概要（最初の確認）
+			1. ① 概要：接続 → 準備 → DB へのアクセス → クローズ
 		</h2>
 
 		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
 			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin-bottom: 10px;">今日は、<strong>Java から DB に命令を出すための入口（JDBC）</strong>を、短い手順として固める回です。</p>
-				<p style="margin: 0;">前回の SQL（何を頼むか）に、<strong>接続→準備→実行→結果</strong>の型を重ねて覚えます。</p>
+				<p style="margin: 0 0 10px 0;">この回の<strong>全体の流れ（型）</strong>は次のとおりです。細部はまだ追わず、<strong>順番だけ</strong>頭に入れてください。</p>
+				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 10px 0; font-size: 13px;">Connection（接続）→ PreparedStatement（SQL 準備・? へのバインド）
+→ executeQuery / executeUpdate（DB へのアクセス＝実行）
+→ ResultSet（SELECT のとき結果を読む）／更新件数を受け取る
+→ try-with-resources または finally でリソースをクローズ</pre>
+				<p style="margin: 0; font-size: 13px; color: #555;">SELECT なら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code>、INSERT/UPDATE/DELETE なら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> と覚えておくと、後の図・コードと対応しやすくなります。</p>
 			</div>
 		</div>
 
@@ -32,8 +37,12 @@
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			2. 学習目標（手順を覚える）
+			2. ② 工程を追う（学習目標・用語・図）
 		</h2>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 0; margin-bottom: 10px;">
+			2-1. 学習目標（手順を覚える）
+		</h3>
 
 		<p style="margin-bottom: 10px;">この回では、JDBC の基本パイプラインを<strong>順番通りに言える</strong>こと、と<strong>安全側の書き方（? とバインド）</strong>を掴むことを目指します。</p>
 
@@ -59,15 +68,9 @@
 Connection ▶ PreparedStatement ▶ executeQuery / executeUpdate ▶ ResultSet</pre>
 			</details>
 		</div>
-	</section>
 
-	<section style="margin-bottom: 30px;">
-		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			3. 写経パート（JDBC の型を体に入れる）
-		</h2>
-
-		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 0; margin-bottom: 10px;">
-			3-1. 用語の確認（最小）
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 24px; margin-bottom: 10px;">
+			2-2. 用語の確認（最小）
 		</h3>
 
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -81,50 +84,72 @@ Connection ▶ PreparedStatement ▶ executeQuery / executeUpdate ▶ ResultSet<
 		</div>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-2. 図でつかむ（4ステップ・安全性・読み方）
+			2-3. 図でつかむ（4ステップ・安全性・読み方）
 		</h3>
 
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 8px 0;"><strong>基本パイプライン（4ステップ）</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_jdbc_pipeline_4steps.svg" alt="JDBC の4ステップ（Connection から ResultSet）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 0 0 8px 0;"><strong>4ステップ全体像</strong></p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_jdbc_four_steps_try_finally.png" alt="JDBC プログラミング4つの絶対工程（try-catch-finally の枠内で接続・準備・実行・解放）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">JDBC は「接続 → 準備 → 実行 → 解放」をこの順番で回す、という全体像をまずイメージしてください。</p>
 			</div>
 
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 8px 0;"><strong>?（プレースホルダ）とバインド</strong>：文字列連結で SQL を作らないのが基本です。</p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_prepared_statement_placeholder.svg" alt="PreparedStatement のプレースホルダとバインド" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 0 0 8px 0;"><strong>DB 接続 URL の分解</strong></p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_db_connection_url_anatomy.png" alt="DB接続URLの分解（プロトコル・ホスト・DB名・ユーザ・パスワードの役割）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">URL の中で「どのDBに、どのユーザでつなぐか」を一つずつ分解して押さえましょう。</p>
 			</div>
 
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 8px 0;"><strong>ResultSet：next と get*</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_resultset_next_getxxx.svg" alt="ResultSet の next と get メソッド" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 0 0 8px 0;"><strong>実行メソッドの分岐</strong></p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_statement_execute_branch.png" alt="executeQuery と executeUpdate の分岐（参照系と更新系の違い）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">SELECT で結果セットを返すときは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code>、INSERT/UPDATE/DELETE で更新件数だけほしいときは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> を使います。</p>
+			</div>
+
+			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0;"><strong>ResultSet のカーソル</strong></p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_resultset_cursor_concept.png" alt="ResultSet のカーソルが行を走査するイメージ（next と getter メソッド）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">カーソルが <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.next()</code> で1行ずつ進み、各行の値を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getInt</code> や <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getString</code> で取り出すイメージです。</p>
+			</div>
+
+			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0;"><strong>PreparedStatement と ?（プレースホルダ）</strong></p>
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_preparedstatement_power.png" alt="PreparedStatement の事前コンパイルとプレースホルダのイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">SQL の「ひな型」を先に用意し、あとから <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setString</code> などで値を流し込むことで、安全かつ高速に実行しやすくなります。</p>
 			</div>
 
 			<div style="margin: 10px 0 0 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 8px 0;"><strong>items テーブルを Java から SELECT（流れ）</strong>：前回の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">items</code> を題材にします。</p>
+				<p style="margin: 0 0 8px 0;"><strong>items テーブルを Java から SELECT（流れの総まとめ）</strong></p>
 				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_items_java_select.svg" alt="items テーブルを Java から SELECT する流れ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">ここまでの 4ステップ・URL・実行メソッド・ResultSet・PreparedStatement を、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">items</code> テーブルの具体例で一度つなげて眺めてみましょう。</p>
 			</div>
 		</div>
+	</section>
 
-		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-2b. 参考：try-catch-finally と手動 close（昔の書き方）
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			3. ③ ソースコードの説明
+		</h2>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 0; margin-bottom: 10px;">
+			3-1. 参考：try-catch-finally と手動 close（昔の書き方）
 		</h3>
 
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<p style="margin: 0 0 10px 0;">JDBC は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Connection</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">PreparedStatement</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> を必ず閉じる必要があります。昔は <strong>finally で close を書く</strong>形が定番でした。</p>
-			<p style="margin: 0 0 10px 0;">ただし、この形はコードが長くなりやすいので、<strong>Java 7 以降は try-with-resources（次の節の形）</strong>を基本にします。</p>
+			<p style="margin: 0 0 10px 0;">ただし、この形はコードが長くなりやすいので、<strong>Java 7 以降は try-with-resources（次の節の形）</strong>を基本にします。<strong>この例では説明を簡単にするため、close は Connection（con）だけ</strong>を示します。</p>
 
 			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">import java.sql.*;
 
 public class LegacyCloseSample {
 	public static void main(String[] args) {
-		Connection conn = null;
+		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 
 		try {
-			conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo", "root", "password");
-			ps = conn.prepareStatement("SELECT item_id FROM items WHERE category = ?");
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo", "root", "password");
+			ps = con.prepareStatement("SELECT item_id FROM items WHERE category = ?");
 			ps.setString(1, "drink");
 			rs = ps.executeQuery();
 			while (rs.next()) {
@@ -133,22 +158,69 @@ public class LegacyCloseSample {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) try { rs.close(); } catch (SQLException ignored) {}
-			if (ps != null) try { ps.close(); } catch (SQLException ignored) {}
-			if (conn != null) try { conn.close(); } catch (SQLException ignored) {}
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 }</pre>
+
+			<details open style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">レガシーな finally/close の例をドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0 0 8px 0; font-size: 15px; color: #333;">下のプレーンテキストの貼り付け欄から、Eclipse などへドラッグで取り込めます。</p>
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 420px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.*;
+
+public class LegacyCloseSample {
+	public static void main(String[] args) {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			con = DriverManager.getConnection("jdbc:mysql://localhost:3306/sample_db?useSSL=false&serverTimezone=Asia/Tokyo", "root", "password");
+			ps = con.prepareStatement("SELECT item_id FROM items WHERE category = ?");
+			ps.setString(1, "drink");
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				System.out.println(rs.getInt("item_id"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
 		</div>
 
 		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-3. Java サンプル（items：category を ? で検索）
+			3-2. Java サンプル（items：category を ? で検索）
 		</h3>
 
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<p style="margin: 0 0 10px 0;">次のサンプルは、<strong>接続情報（URL / ユーザー / パスワード）</strong>は自分の環境に合わせて置き換えてください。DB 側に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">items</code> がある前提です（前回の DDL を流し込んでおくとスムーズです）。</p>
 			<p style="margin: 0 0 10px 0;">依存ライブラリ（例：<strong>mysql-connector-j</strong>）はプロジェクトに追加し、実行時のクラスパスに含めます。</p>
+			<div style="margin: 10px 0 0 0; padding: 10px 12px; background-color: #f0f8ff; border-left: 4px solid #0033ff; border-radius: 6px;">
+				<p style="margin: 0; font-size: 13px;"><strong>先に環境構築</strong>：JAR のDL（learningBOX）→ Eclipse の外部JAR追加 → 接続確認（SampleConnection）までを先に済ませてください。<a href="./00-環境-環境構築（JDBC）.html" style="color: #0033ff; text-decoration: underline;">環境構築ページ</a></p>
+			</div>
 
+			<p style="margin: 15px 0 8px 0; font-weight: bold; color: #0033ff;">サンプル1：SELECT（executeQuery）</p>
 			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -231,35 +303,116 @@ public class ItemsSelectSample {
 					</div>
 				</div>
 			</details>
+			<p style="margin: 20px 0 8px 0; font-weight: bold; color: #0033ff;">サンプル2：INSERT（executeUpdate）</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class ItemsInsertSample {
+
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+
+		String sql = "INSERT INTO items (category, item_name, unit_price) VALUES (?, ?, ?)";
+
+		try (
+			Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(sql);
+		) {
+			ps.setString(1, "drink");
+			ps.setString(2, "sample juice");
+			ps.setInt(3, 120);
+
+			int updated = ps.executeUpdate();
+			System.out.println(updated + " 件追加しました");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</pre>
+
+			<details open style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">サンプル2（INSERT）のコードをドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0 0 8px 0; font-size: 15px; color: #333;">下のプレーンテキストの貼り付け欄から、Eclipse などへドラッグで取り込めます。</p>
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 360px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class ItemsInsertSample {
+
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+
+		String sql = "INSERT INTO items (category, item_name, unit_price) VALUES (?, ?, ?)";
+
+		try (
+			Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(sql);
+		) {
+			ps.setString(1, "drink");
+			ps.setString(2, "sample juice");
+			ps.setInt(3, 120);
+
+			int updated = ps.executeUpdate();
+			System.out.println(updated + " 件追加しました");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
 		</div>
 
-		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
-			3-4. Web アプリとしてデプロイしたときの置き場所（Tomcat / webapps）
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 24px; margin-bottom: 10px;">
+			3-3. サンプルと対応付け（JDBC URL・Setter・Getter・カーソル）
 		</h3>
 
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
-			<p style="margin: 0 0 10px 0;">サーブレット/JSP として Tomcat にデプロイすると、「どのファイルがどこに置かれるか」が決まっています。図の対応を押さえると、404 やクラスが見つからない系のトラブルが減ります。</p>
-			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_tomcat_webapps.png" alt="Tomcat のデプロイ先フォルダ（webapps / WEB-INF / classes / lib）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
-			<ul style="padding-left: 20px; margin: 12px 0 0 0;">
-				<li style="margin-bottom: 8px;"><strong>webapps/myapp/</strong>：コンテキストルート（URL の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">/myapp</code>）。</li>
-				<li style="margin-bottom: 8px;"><strong>index.jsp / css / js / images</strong>：ブラウザから直接アクセスされうる公開リソース。</li>
-				<li style="margin-bottom: 8px;"><strong>WEB-INF/</strong>：外部 URL から直接アクセスできない領域（重要）。</li>
-				<li style="margin-bottom: 8px;"><strong>WEB-INF/web.xml</strong>：デプロイメント記述子（Servlet 設定）。</li>
-				<li style="margin-bottom: 8px;"><strong>WEB-INF/classes/</strong>：コンパイル済み <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">.class</code>（パッケージ階層のまま配置）。</li>
-				<li style="margin-bottom: 0;"><strong>WEB-INF/lib/</strong>：アプリ固有の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">.jar</code> ライブラリ。</li>
+			<p style="margin: 0 0 10px 0;">上の <strong>サンプル1（SELECT）</strong> の各行が、② の図のどこに当たるかを対応づけます。</p>
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 8px;"><strong>JDBC URL（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">String url</code>）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">jdbc:mysql://ホスト:ポート/DB名</code> に続く <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">?</code> 以降は接続オプション（SSL やタイムゾーンなど）。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">user</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">password</code> は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection</code> の第2・第3引数で渡します。</li>
+				<li style="margin-bottom: 8px;"><strong>Setter（バインド）</strong>：SQL 中の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">?</code> に、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setString(番号, 値)</code> や <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setInt</code> で値を安全に流し込みます。番号は SQL 上の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">?</code> の左から 1, 2, … です。</li>
+				<li style="margin-bottom: 8px;"><strong>Getter（結果の取り出し）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> に対して <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getInt("列名")</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getString("列名")</code> などで、現在の行のセルを Java の型で取り出します。</li>
+				<li style="margin-bottom: 0;"><strong>カーソル</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> は「表」全体ではなく、<strong>今どの行を指しているか</strong>というカーソルを持ちます。初期位置はデータ行の手前で、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">next()</code> が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">true</code> のあいだ、1行ずつ進めながら getter で読みます。</li>
 			</ul>
 		</div>
+
 	</section>
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			4. 練習問題（JDBC）
+			4. ④ 写経・練習問題
 		</h2>
 
-		<p style="margin-bottom: 15px;">次の問いに、手元のメモ用紙か、SQL ツール／IDE の実行結果で答えてください。まず自分で考えてから、ヒントや解答を確認してください。</p>
+		<p style="margin-bottom: 12px;">② の図・用語、③ のサンプルで押さえた<strong>同じ流れ</strong>が、次の問題では「言葉」（4-1）と「コード上の空欄」（4-2）のどちらでも追えるようになっています。手元のメモ用紙か IDE で答え、まず自分で考えてからヒント・解答を開いてください。</p>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 0; margin-bottom: 12px;">
+			4-1. 用語・手順の確認（問題1〜5）
+		</h3>
 
 		<!-- ===== 問題1 ===== -->
-		<p style="margin-bottom: 5px;"><strong>問題1</strong>：JDBC の基本パイプラインを、<strong>4つの要素名</strong>を <strong>実行順</strong>に並べて書いてください（英語のクラス名でOK）。</p>
+		<p style="margin-bottom: 5px;"><strong>問題1（選択式）</strong>：次の選択肢 A〜D から、JDBC の基本パイプライン（4ステップ）を<strong>正しい順番</strong>で並べているものを1つ選びなさい。</p>
+		<p style="margin: 0 0 10px 0; font-size: 13px; color: #555;">ここでいう「4ステップ」は<strong>オブジェクトの並びとしての型</strong>です。SELECT では <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code>、更新系では <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> を使う、と③までで押さえたうえで、選択肢の中から<strong>順序として正しいもの</strong>を選んでください。</p>
+		<div style="margin: 10px 0; padding: 10px 12px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0; font-weight: bold; color: #333;">選択肢（この中の語を使います）</p>
+			<p style="margin: 0; font-family: monospace; white-space: pre-wrap;">Connection / PreparedStatement / executeQuery / executeUpdate / ResultSet</p>
+		</div>
+		<div style="margin: 10px 0; padding: 12px 14px; background-color: #fdf5e6; border: 1px solid #e1dbbd; border-radius: 6px; font-family: monospace; white-space: pre-wrap;">
+A) Connection → PreparedStatement → executeQuery / executeUpdate → ResultSet
+B) PreparedStatement → Connection → executeQuery / executeUpdate → ResultSet
+C) Connection → executeQuery / executeUpdate → PreparedStatement → ResultSet
+D) Connection → PreparedStatement → ResultSet → executeQuery / executeUpdate</div>
 		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
 		<details open style="margin-top: 8px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
@@ -270,16 +423,14 @@ public class ItemsSelectSample {
 		<details open style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">1) Connection
-2) PreparedStatement
-3) executeQuery / executeUpdate（実行）
-4) ResultSet（SELECT のとき）</pre>
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">正解：A
+
+Connection → PreparedStatement → executeQuery / executeUpdate → ResultSet</pre>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 120px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">1) Connection
-2) PreparedStatement
-3) executeQuery / executeUpdate（実行）
-4) ResultSet（SELECT のとき）</textarea>
+					<textarea readonly style="width: 100%; height: 95px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">正解：A
+
+Connection → PreparedStatement → executeQuery / executeUpdate → ResultSet</textarea>
 				</div>
 			</div>
 		</details>
@@ -364,31 +515,193 @@ public class ItemsSelectSample {
 			</div>
 		</details>
 
-		<!-- ===== 問題6 ===== -->
-		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題6</strong>：ユーザー入力を文字列連結で SQL に埋め込まず、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">PreparedStatement</code> を使う主な理由を、セキュリティ観点で一言で書いてください。</p>
-		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
-		<details open style="margin-top: 8px;">
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 28px; margin-bottom: 12px;">
+			4-2. コード読解（穴埋め：問題7〜10）
+		</h3>
+
+		<p style="margin-bottom: 10px;">③ のサンプルと<strong>同じ形のクラス全体</strong>を載せています（<strong>import 行は載せません</strong>。手元のプロジェクトで <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">java.sql.*</code> などを追加してください）。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">/* ??? */</code> に入る<strong>型名・メソッド名</strong>を答えます。</p>
+
+		<!-- ===== 問題7 ===== -->
+		<p style="margin-bottom: 5px; margin-top: 15px;"><strong>問題7：コード読解（SELECT・基本）</strong> — 次のコードの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">/* ??? */</code> に入る適切な語（型名）を書いてください。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 8px 0 10px 0;">// import は手元で追加（例: java.sql.* および SQLException）
+
+public class CodeRead07 {
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+
+		String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE category = ? ORDER BY item_id";
+
+		try (
+			// ① DB に接続するオブジェクトの型
+			/* ??? */ conn = DriverManager.getConnection(url, user, password);
+			// ② SQL を準備するオブジェクトの型
+			/* ??? */ ps = conn.prepareStatement(sql);
+		) {
+			ps.setString(1, "drink");
+
+			// ③ SELECT の結果を受け取るオブジェクトの型（executeQuery の戻り値）
+			try (/* ??? */ rs = ps.executeQuery()) {
+				while (rs.next()) {
+					int itemId = rs.getInt("item_id");
+					String category = rs.getString("category");
+					String itemName = rs.getString("item_name");
+					int unitPrice = rs.getInt("unit_price");
+
+					System.out.println(itemId + " | " + category + " | " + itemName + " | " + unitPrice);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</pre>
+		<details open style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0;">「入力が SQL の形を壊して、意図しない命令が混ざる」系の攻撃を、設計上しづらくします。</p>
+				<p style="margin: 0;">4ステップのうち、「接続」「準備」「結果セット」を表すクラス名と、SELECT に使う実行メソッド名を思い出してください。</p>
 			</div>
 		</details>
 		<details open style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SQL インジェクション対策（悪意ある入力を SQL として解釈されにくくする）</pre>
-				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
-					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 85px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SQL インジェクション対策（悪意ある入力を SQL として解釈されにくくする）</textarea>
-				</div>
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">/* ??? */ conn → Connection
+/* ??? */ ps   → PreparedStatement
+/* ??? */ rs   → ResultSet（executeQuery の戻り値）</pre>
 			</div>
 		</details>
-	</section>
 
-	<section style="margin-bottom: 30px;">
-		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			5. ラボ（10分チェックリスト）
-		</h2>
+		<!-- ===== 問題8 ===== -->
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題8：コード読解（SELECT・カーソル）</strong> — 問題7と同じ前提の<strong>クラス全体</strong>のうち、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">/* ??? */</code> に入る<strong>メソッド名</strong>だけを書いてください。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 8px 0 10px 0;">// import は手元で追加（例: java.sql.* および SQLException）
+
+public class CodeRead08 {
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+		String sql = "SELECT item_id FROM items WHERE category = ? ORDER BY item_id";
+
+		try (
+			Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(sql);
+		) {
+			ps.setString(1, "drink");
+
+			try (ResultSet rs = ps.executeQuery()) {
+				// ① 次の行に進むメソッド
+				while (rs. /* ??? */ ()) {
+					// ② 列 item_id を int で取り出すメソッド
+					int itemId = rs. /* ??? */ ("item_id");
+					System.out.println(itemId);
+				}
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</pre>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> のカーソルを動かすメソッドと、int 型を取り出す getter メソッドです。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">while (rs. /* ??? */ ()) → rs.next()
+int itemId = rs. /* ??? */ ("item_id"); → rs.getInt("item_id")</pre>
+			</div>
+		</details>
+
+		<!-- ===== 問題9 ===== -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題9：コード読解（UPDATE・基本）</strong> — 次のコードの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">/* ??? */</code> に入る適切な<strong>メソッド名</strong>を書いてください。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 8px 0 10px 0;">// import は手元で追加（例: java.sql.* および SQLException）
+
+public class CodeRead09 {
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+		String sql = "UPDATE items SET unit_price = ? WHERE item_id = ?";
+
+		try (
+			Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(sql);
+		) {
+			ps.setInt(1, 150);
+			ps.setInt(2, 1);
+
+			// ① 更新系で使う実行メソッド
+			int updated = ps. /* ??? */ ();
+			System.out.println(updated + " 件更新しました");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</pre>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">INSERT/UPDATE/DELETE で更新件数（int）を返すメソッドです。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">ps. /* ??? */ (); → ps.executeUpdate();</pre>
+			</div>
+		</details>
+
+		<!-- ===== 問題10 ===== -->
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題10：コード読解（INSERT・バインド）</strong> — 次のコードの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">/* ??? */</code> に入る適切な語（型名・メソッド名）を書いてください。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 8px 0 10px 0;">// import は手元で追加（例: java.sql.* および SQLException）
+
+public class CodeRead10 {
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+		String sql = "INSERT INTO items (category, item_name, unit_price) VALUES (?, ?, ?)";
+
+		try (
+			/* ??? */ conn = DriverManager.getConnection(url, user, password);
+			/* ??? */ ps = conn.prepareStatement(sql);
+		) {
+			// ① 1つ目の ? に文字列を入れるメソッド
+			ps. /* ??? */ (1, "drink");
+			ps.setString(2, "sample juice");
+			// ② 3つ目の ? に int を入れるメソッド
+			ps. /* ??? */ (3, 120);
+
+			int updated = ps.executeUpdate();
+			System.out.println(updated + " 件追加しました");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</pre>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Connection</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">PreparedStatement</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setString</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setInt</code> から選んでください。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">/* ??? */ conn → Connection
+/* ??? */ ps   → PreparedStatement
+ps. /* ??? */ (1, "drink"); → ps.setString(1, "drink");
+ps. /* ??? */ (3, 120);     → ps.setInt(3, 120);</pre>
+			</div>
+		</details>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 28px; margin-bottom: 12px;">
+			4-3. ラボ（10分チェックリスト）
+		</h3>
 
 		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
 			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -407,10 +720,81 @@ public class ItemsSelectSample {
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			6. まとめ（写経で締める）
+			5. ⑤ 発展問題（余力向け）
 		</h2>
 
-		<p style="margin: 0 0 10px 0;">最後に、JDBC の4ステップを短い写経で締めます。</p>
+		<p style="margin-bottom: 15px;">④ の基本が一通りできたあとに取り組む想定です。ヒント・解答は折りたたみにまとめています。</p>
+
+		<p style="margin-bottom: 5px; margin-top: 15px;"><strong>発展1（記述）</strong>：ユーザー入力を文字列連結で SQL に埋め込まず、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">PreparedStatement</code> を使う主な理由を、セキュリティ観点で一言で書いてください。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">「入力が SQL の形を壊して、意図しない命令が混ざる」系の攻撃を、設計上しづらくします。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">SQL インジェクション対策（悪意ある入力を SQL として解釈されにくくする）</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 85px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">SQL インジェクション対策（悪意ある入力を SQL として解釈されにくくする）</textarea>
+				</div>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 28px;"><strong>発展2（コード）</strong>：次のプログラムのうち、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> を開いたあとのブロックが空です。<strong>コメントの指示どおり</strong>、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">while</code> でカーソルを進めながら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_id</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> を1行ずつ表示するコードを書いてください（import は手元で追加）。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 8px 0 10px 0;">// import は手元で追加（例: java.sql.* および SQLException）
+
+public class CodeAdvanced02 {
+	public static void main(String[] args) {
+		String url = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+		String user = "root";
+		String password = "password";
+		String sql = "SELECT item_id, item_name FROM items WHERE category = ? ORDER BY item_id";
+
+		try (
+			Connection conn = DriverManager.getConnection(url, user, password);
+			PreparedStatement ps = conn.prepareStatement(sql);
+		) {
+			ps.setString(1, "drink");
+
+			try (ResultSet rs = ps.executeQuery()) {
+				// ここで while を使って、カーソルを移動しつつ item_id と item_name を表示するコードを書く
+
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+}</pre>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.next()</code> が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">true</code> のあいだ繰り返し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getInt</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getString</code> で列を取り出します。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">try (ResultSet rs = ps.executeQuery()) {
+	while (rs.next()) {
+		int id = rs.getInt("item_id");
+		String name = rs.getString("item_name");
+		System.out.println(id + " | " + name);
+	}
+}</pre>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			6. まとめ（①の型を思い出す）
+		</h2>
+
+		<p style="margin: 0 0 10px 0;">最後に、① で示した JDBC の流れを短く復習します。</p>
 
 		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace;">
 1) Connection：DB に接続する
