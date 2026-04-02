@@ -1,7 +1,0 @@
-scanned=20
-hashes=18
-dupe_groups=2
-moved=2
-
-MOVED	C:\Users\kawak\Documents\cursor-projects\Java-Web\diagrams\exported\preview_012.png	->	C:\Users\kawak\Documents\cursor-projects\Java-Web\diagrams\exported\old\preview_012.png
-MOVED	C:\Users\kawak\Documents\cursor-projects\Java-Web\diagrams\exported\preview_013.png	->	C:\Users\kawak\Documents\cursor-projects\Java-Web\diagrams\exported\old\preview_013.png

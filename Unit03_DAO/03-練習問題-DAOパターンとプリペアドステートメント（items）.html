@@ -1,0 +1,212 @@
+第3回：DAOパターンの練習問題（items）〜プリペアドステートメントの練習〜
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+	
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			この演習の目的
+		</h2>
+		
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 10px; border-left: 5px solid #0033ff;">
+			<div style="background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 10px 0;">DAOに JDBC を集約し、PreparedStatement の <strong>?</strong> と <strong>setXxx</strong> の対応を体に入れる練習です。</p>
+				<ul style="padding-left: 20px; margin: 0;">
+					<li style="margin-bottom: 6px;">題材は <strong>items</strong>（ECサイトの商品）</li>
+					<li style="margin-bottom: 6px;">SQL文字列に値を連結しない（必ず ? に入れてバインド）</li>
+					<li style="margin-bottom: 0;">try-with-resources でリソースを適切に閉じる</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			基本問題（3問・items）
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0033ff; margin-bottom: 20px;">
+			<p style="margin: 0;"><strong>目標</strong>：DAOクラス内で PreparedStatement を使い、ResultSet を読み取り処理する</p>
+		</div>
+
+		<!-- 問題1 -->
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題1</strong>：カテゴリで絞り込み — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">category</code> 指定で商品名と単価を表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE category = ?</code> を使い、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ps.setString(1, category)</code> で値を渡します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public class ItemDao {
+
+	public void printItemsByCategory(String category) throws SQLException {
+		String sql = "SELECT item_name, unit_price FROM items WHERE category = ?";
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+		     PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, category);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					String name = rs.getString("item_name");
+					int price   = rs.getInt("unit_price");
+					System.out.println(name + " : " + price + "円");
+				}
+			}
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class ItemDao {
+
+	public void printItemsByCategory(String category) throws SQLException {
+		String sql = "SELECT item_name, unit_price FROM items WHERE category = ?";
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+		     PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setString(1, category);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					String name = rs.getString("item_name");
+					int price   = rs.getInt("unit_price");
+					System.out.println(name + " : " + price + "円");
+				}
+			}
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- 問題2 -->
+		<p style="margin-bottom: 5px; margin-top: 28px;"><strong>問題2</strong>：単価しぼり — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">minPrice</code> 以上の商品だけを表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE unit_price &gt;= ?</code> を入れ、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ps.setInt(1, minPrice)</code> でバインドします。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public class ItemDao {
+
+	public void printItemsByMinPrice(int minPrice) throws SQLException {
+		String sql = "SELECT item_name, unit_price FROM items WHERE unit_price &gt;= ?";
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+		     PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, minPrice);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					String name = rs.getString("item_name");
+					int price   = rs.getInt("unit_price");
+					System.out.println(name + " : " + price + "円");
+				}
+			}
+		}
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 210px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class ItemDao {
+
+	public void printItemsByMinPrice(int minPrice) throws SQLException {
+		String sql = "SELECT item_name, unit_price FROM items WHERE unit_price &gt;= ?";
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+		     PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, minPrice);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				while (rs.next()) {
+					String name = rs.getString("item_name");
+					int price   = rs.getInt("unit_price");
+					System.out.println(name + " : " + price + "円");
+				}
+			}
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<!-- 問題3 -->
+		<p style="margin-bottom: 5px; margin-top: 28px;"><strong>問題3</strong>：合計金額 — items の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code> の合計を DAO で計算し、Java 側で表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL で全件を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT unit_price FROM items</code> して、ループで <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">total += rs.getInt("unit_price")</code> の形で合計します。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public class ItemDao {
+
+	public int sumUnitPrices() throws SQLException {
+		String sql = "SELECT unit_price FROM items";
+		int total = 0;
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+		     PreparedStatement ps = con.prepareStatement(sql);
+		     ResultSet rs = ps.executeQuery()) {
+
+			while (rs.next()) {
+				total += rs.getInt("unit_price");
+			}
+		}
+		return total;
+	}
+}</pre>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 200px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class ItemDao {
+
+	public int sumUnitPrices() throws SQLException {
+		String sql = "SELECT unit_price FROM items";
+		int total = 0;
+
+		try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+		     PreparedStatement ps = con.prepareStatement(sql);
+		     ResultSet rs = ps.executeQuery()) {
+
+			while (rs.next()) {
+				total += rs.getInt("unit_price");
+			}
+		}
+		return total;
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 10px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			Cursorへの依頼（プロンプト例）
+		</h2>
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">次のように「DAOに切り出す」「? を使う」「try-with-resources」を明示すると、意図に合ったコードになりやすいです。</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">「items テーブルを使って、
+DAOに切り出したメソッドを実装して
+PreparedStatementの ' ? ' と setXxx を使い、
+try-with-resources で閉じる形にしてください。」</pre>
+		</div>
+	</section>
+</div>
+

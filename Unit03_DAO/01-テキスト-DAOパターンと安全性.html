@@ -1,0 +1,132 @@
+第3回：DAOパターンと安全性〜「直書きJDBC」からの脱却〜
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+	
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			1. 今日は「DAO」を固定する（概要）
+		</h2>
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 10px 0;">この回は、Java から DB に命令する作業を **DAO（DB担当窓口）** に集約し、上流側（呼び出し側）と切り離すための回です。</p>
+				<p style="margin: 0;">扱う題材の基本は <strong>items</strong>（ECサイトの商品）で、必要になったときだけ発展として関連テーブルを扱います。</p>
+			</div>
+		</div>
+
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_01_dao-pattern-security_escape-direct-jdbc.png" alt="DAOパターンと安全性（直書きJDBCからの脱却）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			2. なぜDAOが必要？（直書きJDBCの弱点）
+		</h2>
+
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_02_brittle-vulnerable-direct-jdbc.png" alt="直書きJDBCの2つの致命的弱点（変更・攻撃）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin: 15px 0; padding: 15px; background-color: #f0f8ff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0;"><strong>要点</strong></p>
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 6px;">SQLやDB処理を呼び出し側に散らすと、修正のたびに影響範囲が増えやすい（変更に弱い）</li>
+				<li style="margin-bottom: 0;">文字列連結でSQLを組み立てると、意図しない入力が混ざりやすい（攻撃に弱い）</li>
+			</ul>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			3. DAO / DTO / Entity の3箱（写経）
+		</h2>
+
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_04_three-boxes_dao-dto-entity.png" alt="DAO/DTO/Entityの3箱と役割" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<details style="margin-top: 10px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">写経（Service → DAO → DB）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">Service → DAO → DB
+DTO = 運ぶ箱（画面/呼び出し向け）
+Entity = DBの行（テーブル向け）</pre>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			4. データの旅（保存・取得）
+		</h2>
+
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_06_data-journey_save.png" alt="データの旅（保存：UserScreen → Service → DAO → DB）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_07_data-journey_load.png" alt="データの旅（取得：DB → DAO → ResultSet → User）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin-top: 10px; padding: 15px; background-color: #f0f8ff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">ポイントは、<strong>呼び出し側は「DAOに頼むだけ」</strong>、DAOが PreparedStatement と ResultSet を責任を持って扱うことです。</p>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			5. PreparedStatement：? と setXxx の対応
+		</h2>
+
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_08_sql-injection_anatomy.png" alt="SQLインジェクションの解剖（文字列連結が危険）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_09_preparedstatement_strong-shield.png" alt="PreparedStatementによる無効化（予約語 ? に値を渡す）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_10_vulnerable-concat_vs_preparedstatement.png" alt="脆弱な書き方 vs PreparedStatement（実装比較）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<details style="margin-top: 10px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">最小コードイメージ（items検索）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">String sql = "SELECT item_name, unit_price FROM items WHERE category = ?";
+
+try (Connection con = DriverManager.getConnection(URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setString(1, category); // 先頭の「?」に値を入れる
+
+	try (ResultSet rs = ps.executeQuery()) {
+		while (rs.next()) {
+			// rs.getString(...), rs.getInt(...)
+		}
+	}
+}</pre>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			6. 最小のミッション（DAOへ切り出す）
+		</h2>
+
+		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_11_dao-refactoring_mission_preparedstatement.png" alt="DAOへ切り出す・PreparedStatementへ置換するミッション" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin-top: 10px; padding: 15px; background-color: #f0f8ff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 6px;">直書き JDBC を DAO クラスに移し、呼び出し側は DAO を「1行呼ぶ」状態にする</li>
+				<li style="margin-bottom: 0;">SQL は PreparedStatement にし、文字列連結をやめて「?」へ setXxx で値を渡す</li>
+			</ul>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 10px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			7. 例外処理はオプション（必要なら）
+		</h2>
+		<p style="margin: 0;">この回は <strong>例外処理の詳細を必須にしない</strong> ため、深掘りは正課外の [オプション講座：例外処理] を使ってください。</p>
+	</section>
+</div>
+

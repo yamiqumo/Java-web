@@ -1,0 +1,56 @@
+第3回（復習）：DAOパターンと安全性 — 自習
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+	
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			復習：図で思い出す（DAO・PreparedStatement）
+		</h2>
+		
+		<p style="margin: 0 0 14px 0;">このページは復習用です。本編（`01-テキスト-DAOパターンと安全性.html`）の内容を、下の図で短く確認してください。</p>
+		
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #f0f8ff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">① DAO/DTO/Entity の3箱</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_04_three-boxes_dao-dto-entity.png" alt="DAO/DTO/Entityの3箱" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">② 保存（呼び出し側→DAO→DB）</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_06_data-journey_save.png" alt="データの旅（保存）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">③ 取得（DB→DAO→呼び出し側）</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_07_data-journey_load.png" alt="データの旅（取得）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">④ SQLインジェクションと対策</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_08_sql-injection_anatomy.png" alt="SQLインジェクションの解剖" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+
+		<div style="margin: 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">⑤ PreparedStatementで無効化</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_09_preparedstatement_strong-shield.png" alt="PreparedStatementによる無効化" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			復習チェック（口頭で確認）
+		</h2>
+		<ul style="padding-left: 20px; margin: 0;">
+			<li style="margin-bottom: 6px;">DAOに集約する意味を一言で言える</li>
+			<li style="margin-bottom: 6px;">`?` と `setXxx` が「値を入れる位置」と「渡す順番」だと説明できる</li>
+			<li style="margin-bottom: 0;">呼び出し側はDAOに頼むだけで、SQL文字列を散らさないと約束できる</li>
+		</ul>
+	</section>
+
+	<section style="margin-bottom: 10px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			例外処理は必要ならオプションへ
+		</h2>
+		<p style="margin: 0;">try / catch / try-with-resources は、理解に応じて [オプション講座：例外処理](../Unit90_Exception/01-テキスト-Java例外処理.html) を参照してください。</p>
+	</section>
+
+</div>
+

@@ -24,7 +24,7 @@
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<p style="margin: 0 0 8px 0;"><strong>Java と SQL（DB）の位置づけ</strong>：SQL は「言語」、JDBC は「Java からその言語を運ぶための橋（API）」です。</p>
-			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_java_sql_bridge.svg" alt="Java と DB をつなぐ JDBC の橋のイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_java_sql_bridge.svg" alt="Java と DB をつなぐ JDBC の橋のイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 		</div>
 	</section>
 
@@ -83,37 +83,37 @@ Connection ▶ PreparedStatement ▶ executeQuery / executeUpdate ▶ ResultSet<
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>4ステップ全体像</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_jdbc_four_steps_try_finally.png" alt="JDBC プログラミング4つの絶対工程（try-catch-finally の枠内で接続・準備・実行・解放）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_jdbc_four_steps_try_finally.png" alt="JDBC プログラミング4つの絶対工程（try-catch-finally の枠内で接続・準備・実行・解放）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">JDBC は「接続 → 準備 → 実行 → 解放」をこの順番で回す、という全体像をまずイメージしてください。</p>
 			</div>
 
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>DB 接続 URL の分解</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_db_connection_url_anatomy.png" alt="DB接続URLの分解（プロトコル・ホスト・DB名・ユーザ・パスワードの役割）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_db_connection_url_anatomy.png" alt="DB接続URLの分解（プロトコル・ホスト・DB名・ユーザ・パスワードの役割）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">URL の中で「どのDBに、どのユーザでつなぐか」を一つずつ分解して押さえましょう。</p>
 			</div>
 
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>実行メソッドの分岐</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_statement_execute_branch.png" alt="executeQuery と executeUpdate の分岐（参照系と更新系の違い）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_statement_execute_branch.png" alt="executeQuery と executeUpdate の分岐（参照系と更新系の違い）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">SELECT で結果セットを返すときは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code>、INSERT/UPDATE/DELETE で更新件数だけほしいときは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> を使います。</p>
 			</div>
 
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>ResultSet のカーソル</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_resultset_cursor_concept.png" alt="ResultSet のカーソルが行を走査するイメージ（next と getter メソッド）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_resultset_cursor_concept.png" alt="ResultSet のカーソルが行を走査するイメージ（next と getter メソッド）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">カーソルが <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.next()</code> で1行ずつ進み、各行の値を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getInt</code> や <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getString</code> で取り出すイメージです。</p>
 			</div>
 
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>PreparedStatement と ?（プレースホルダ）</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_preparedstatement_power.png" alt="PreparedStatement の事前コンパイルとプレースホルダのイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_preparedstatement_power.png" alt="PreparedStatement の事前コンパイルとプレースホルダのイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">SQL の「ひな型」を先に用意し、あとから <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setString</code> などで値を流し込むことで、安全かつ高速に実行しやすくなります。</p>
 			</div>
 
 			<div style="margin: 10px 0 0 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>items テーブルを Java から SELECT（流れの総まとめ）</strong></p>
-				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/exported/unit02/unit02_items_java_select.svg" alt="items テーブルを Java から SELECT する流れ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_items_java_select.svg" alt="items テーブルを Java から SELECT する流れ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 				<p style="margin: 6px 0 0 0; font-size: 13px; color: #555;">ここまでの 4ステップ・URL・実行メソッド・ResultSet・PreparedStatement を、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">items</code> テーブルの具体例で一度つなげて眺めてみましょう。</p>
 			</div>
 		</div>

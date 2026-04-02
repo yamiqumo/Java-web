@@ -30,6 +30,14 @@
 | 第10回 | 5/26 | Online | MVC完成 & 4つのスコープ | MVCの三角形と「データの旅」 | [unit10](units/unit10.md) |
 | SP2 | 5/31(日) | 実習 | 【実地②】MVC最終演習 & 発表会 | 設計図（Blueprint）の再現 | [sp02](units/sp02.md) |
 
+### オプション講座（正課外・DAO前推奨）
+
+第3回（DAO）の直前に、**30分〜1時間**で例外の基礎〜 try-with-resources までをまとめる任意枠。受講しなくても第3回に進められるが、JDBC の `catch` 理解が楽になる。
+
+| 名称 | 目安時間 | タイミング | ページ |
+| :--- | :--- | :--- | :--- |
+| Java 例外処理オプション | 30分〜1時間 | 第3回（4/8）直前・日程は別途 | [optional-exception-handling](units/optional-exception-handling.md) |
+
 ---
 
 ## 3本柱（共通ルール）
