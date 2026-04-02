@@ -18,7 +18,7 @@ def image_pixel_hash(path: pathlib.Path) -> str:
 
 def main() -> None:
 	root = pathlib.Path(__file__).resolve().parents[1]
-	exported = root / "diagrams" / "exported"
+	exported = root / "diagrams" / "00-exported"
 	unit01_dir = exported / "unit01"
 	old_dir = exported / "old"
 	old_dir.mkdir(parents=True, exist_ok=True)

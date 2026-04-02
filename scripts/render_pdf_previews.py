@@ -43,7 +43,7 @@ def render_previews(
 def main() -> None:
 	root = pathlib.Path(__file__).resolve().parents[1]
 	input_dir = root / "diagrams"
-	output_dir = input_dir / "exported"
+	output_dir = input_dir / "00-exported"
 
 	candidates = [p.name for p in sorted(input_dir.glob("*.pdf"))]
 
