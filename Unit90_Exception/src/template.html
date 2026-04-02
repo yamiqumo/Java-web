@@ -21,7 +21,7 @@
 			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin-bottom: 10px;">プログラムの実行中に起きる<strong>予期せぬトラブル</strong>を Java では<strong>例外（Exception）</strong>として表し、<strong>try-catch</strong> などで扱うことで、いきなり強制終了せずにログや代替処理につなげられます。</p>
 				<p style="margin: 0 0 10px 0;">このテキストは、SQL / JDBC で扱った <strong>items</strong>（商品）のイメージを軸にしつつ、<strong>try-catch-finally</strong>・<strong>複数 catch</strong>・<strong>try-with-resources</strong> までを図と短いコードでたどります。発展として、<strong>社員と部署（別テーブル想定）</strong>のチェック例外も扱います。</p>
-				<p style="margin: 0; font-size: 14px; color: #555;">※ 図は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">diagrams/Exception/</code> の PNG を相対パスで参照します。ファイルがまだ無い環境では画像が表示されないことがあります。</p>
+				<p style="margin: 0; font-size: 14px; color: #555;">※ 図は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">diagrams/Exception/</code> の PNG を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">raw.githubusercontent.com</code> から絶対URLで参照します。</p>
 			</div>
 		</div>
 	</section>
@@ -73,7 +73,7 @@
 			<p style="margin: 0 0 10px 0;">例外は、<strong>実行中</strong>に発生したトラブルを表すオブジェクトです。捕捉しないとスタックトレースを出してスレッドが終了する、などの動きになります（どう終わるかは状況次第）。</p>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図1</strong>：例外のイメージ（ハンドリングの有無の対比）</p>
-				<img src="../../diagrams/Exception/opt-exception_01_what-is-exception.png" alt="例外とは：実行中のトラブルとハンドリングの対比" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_01_what-is-exception.png" alt="例外とは：実行中のトラブルとハンドリングの対比" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -105,7 +105,7 @@
 			</table>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図2</strong>：ビルド時と実行中の境界</p>
-				<img src="../../diagrams/Exception/opt-exception_02_compile-vs-runtime.png" alt="コンパイル時と実行時の違い" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_02_compile-vs-runtime.png" alt="コンパイル時と実行時の違い" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -116,7 +116,7 @@
 			<p style="margin: 0 0 10px 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Throwable</code> の下に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Error</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Exception</code> があります。</p>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図3</strong>：Throwable から Error / Exception / RuntimeException までのマップ</p>
-				<img src="../../diagrams/Exception/opt-exception_03_throwable-hierarchy-map.png" alt="Throwable 階層の全体マップ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_03_throwable-hierarchy-map.png" alt="Throwable 階層の全体マップ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -128,7 +128,7 @@
 			<p style="margin: 0 0 10px 0;">例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">IOException</code>、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SQLException</code>（items を JDBC で扱うときに登場します）。</p>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図4</strong>：チェック例外のイメージ</p>
-				<img src="../../diagrams/Exception/opt-exception_04_checked-exception.png" alt="チェック例外：コンパイラが処理を強制するイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_04_checked-exception.png" alt="チェック例外：コンパイラが処理を強制するイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -140,7 +140,7 @@
 			<p style="margin: 0 0 10px 0;">例：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">NullPointerException</code>、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">IllegalArgumentException</code>、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ArithmeticException</code>。</p>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図5</strong>：非チェック例外のイメージ</p>
-				<img src="../../diagrams/Exception/opt-exception_05_unchecked-exception.png" alt="非チェック例外：RuntimeException 系のイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_05_unchecked-exception.png" alt="非チェック例外：RuntimeException 系のイメージ" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -151,7 +151,7 @@
 			<p style="margin: 0 0 10px 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Error</code> はメモリ枯渇（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">OutOfMemoryError</code>）など、<strong>アプリ単体では立て直しが難しい</strong>ことが多い層です。入門では<strong>捕まえない</strong>方針でよいです。</p>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図6</strong>：Error の位置づけ</p>
-				<img src="../../diagrams/Exception/opt-exception_06_error-class.png" alt="Error クラス：深刻な問題として扱う" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_06_error-class.png" alt="Error クラス：深刻な問題として扱う" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -162,7 +162,7 @@
 			<p style="margin: 0 0 10px 0;">「外因で起きやすい／処理経路を書かせる」vs「バグ寄り／強制しない」という<strong>設計上の役割</strong>で整理すると、頭に入りやすくなります。</p>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図7</strong>：外部／内部と対処義務の整理（2×2）</p>
-				<img src="../../diagrams/Exception/opt-exception_07_responsibility-matrix.png" alt="例外の責任分界マトリクス" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_07_responsibility-matrix.png" alt="例外の責任分界マトリクス" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 		</div>
 
@@ -172,11 +172,11 @@
 		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図8</strong>：try／catch／finally の役割</p>
-				<img src="../../diagrams/Exception/opt-exception_08_try-catch-finally-anatomy.png" alt="try catch finally の構造の比喩図" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_08_try-catch-finally-anatomy.png" alt="try catch finally の構造の比喩図" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 			<div style="margin: 10px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 8px 0;"><strong>図9</strong>：正常系と異常系の実行フロー</p>
-				<img src="../../diagrams/Exception/opt-exception_09_execution-flow-normal-vs-exception.png" alt="正常時と例外時のフローと finally 合流" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+				<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/Exception/opt-exception_09_execution-flow-normal-vs-exception.png" alt="正常時と例外時のフローと finally 合流" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 			</div>
 			<p style="margin: 12px 0 10px 0;">構文の流れだけ、<strong>最短の例</strong>（0 除算）で確認します。items の話はこのあとの節で続けます。</p>
 			<p style="margin: 0 0 10px 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">finally</code> は例外の有無にかかわらず<strong>ほぼ必ず</strong>実行されます（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">System.exit</code> で JVM が止まるなど、例外は別の機会で触れれば十分です）。</p>
