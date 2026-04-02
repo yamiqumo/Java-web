@@ -29,5 +29,5 @@
 
 ## 注記
 
-- スライド原稿・本文・図は別途作成する（Gemini 等）。図版のファイル名・カリキュラム割り付けは [diagrams/Exception/README.md](../../diagrams/Exception/README.md) を参照。
+- スライド原稿・本文・図は別途作成する（Gemini 等）。図版のファイル名・カリキュラム割り付けは [diagrams/90-exception/README.md](../../diagrams/90-exception/README.md) を参照。
 - 将来、HTML 教材用フォルダを切る場合は [.cursorrules](../../.cursorrules) の命名規則（例: `02-復習用-…`、単元フォルダ `UnitXX_…`）に合わせる。
