@@ -1,0 +1,406 @@
+Java 例外処理〜実行時のトラブルを読み解き、扱う〜
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		Java 例外処理〜実行時のトラブルを読み解き、扱う〜
+	</h1>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			1. 本単元の概要
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin-bottom: 10px;">プログラムは<strong>コンパイルが通っても、実行中に想定外のことが起きる</strong>ことがあります。Java ではそのとき投げられるのが<strong>例外（Exception）</strong>です。</p>
+				<p style="margin: 0;">この単元では、<strong>例外の見方</strong>と<strong>try / catch / finally</strong>、<strong>複数の catch の順序</strong>、<strong>try-with-resources</strong>までを、短いコードでたどります。</p>
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			2. 学習目標
+		</h2>
+
+		<p style="margin-bottom: 10px;">次の項目を、図やコードとあわせて説明できることを目指します。</p>
+
+		<div style="background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px; padding: 10px 15px; margin-top: 5px;">
+			<details open style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">コンパイルエラーと実行時のトラブルを区別できる</summary>
+				<p style="margin: 10px 0 5px 0; padding-left: 5px;">コンパイルは「文法と型のチェック」、実行中の例外は「動いているときに起きた異常」として切り分けられる。</p>
+			</details>
+			<details open style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">チェック例外と非チェック例外をざっくり説明できる</summary>
+				<p style="margin: 10px 0 5px 0; padding-left: 5px;">チェック例外は呼び出し側に処理を強いることが多い。非チェック例外（RuntimeException 系）は実行時に起きやすい論理ミス・前提崩れとして扱われる。</p>
+			</details>
+			<details open style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">try / catch / finally の流れを追える</summary>
+				<p style="margin: 10px 0 5px 0; padding-left: 5px;">try で囲んだ範囲で例外が起きると、対応する catch にジャンプする。finally は（ほぼ）必ず通る。</p>
+			</details>
+			<details open style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">複数 catch で広い型（Exception）を最後に置く理由を言える</summary>
+				<p style="margin: 10px 0 5px 0; padding-left: 5px;">上から順に「この型か？」と照合するため、親クラスを先に書くと子の catch に届かない。</p>
+			</details>
+			<details open style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">multi-catch（|）の役割を言える</summary>
+				<p style="margin: 10px 0 5px 0; padding-left: 5px;">同じ処理で複数種類の例外をまとめて捕まえたいときに使う（catch ブロックの重複を減らす）。</p>
+			</details>
+			<details open style="margin: 8px 0;">
+				<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">try-with-resources が何のためか一言で言える</summary>
+				<p style="margin: 10px 0 5px 0; padding-left: 5px;">開いたリソース（close が必要なもの）を、ブロックの終わりで確実に閉じるための書き方。</p>
+			</details>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			3. 本編
+		</h2>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 0; margin-bottom: 10px;">
+			3-1. コンパイルエラーと実行時の違い
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 10px;"><strong>コンパイルエラー</strong>：実行前の段階でコンパイラが見つける誤り（型の不一致、未定義の名前など）。プログラムは<strong>起動できない</strong>。</li>
+				<li style="margin-bottom: 0;"><strong>実行時の例外</strong>：起動後の処理の途中で起きる。例：0 で割る、配列の範囲外、想定外の入力値など。</li>
+			</ul>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			3-2. Throwable の階層（ざっくり）
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Throwable</code> の下に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Error</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Exception</code> があります。入門では <strong>Error は捕まえない</strong>（VM や環境側の深刻な問題が多い）方針でよいです。</p>
+			<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Exception</code> のうち <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">RuntimeException</code> とそのサブクラスが<strong>非チェック例外</strong>、それ以外の多くが<strong>チェック例外</strong>です。</p>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			3-3. 自販機の例：非チェック例外（IllegalArgumentException）
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">本数が 0 以下なら、メソッドの前提が壊れているので <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">IllegalArgumentException</code> を投げます（呼び出し側は try-catch しなくてもコンパイルは通ります＝非チェック）。</p>
+
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">public class VendingMachine {
+
+	// フィールド
+	String drinkName = "水";
+	int stock = 3;
+
+	// 引数なしのコンストラクタ（中身が空なので1行でよい）
+	public VendingMachine() {}
+
+	// 指定本数を購入する。本数が不正なら非チェック例外を投げる
+	public void buy(int bottles) {
+		if (bottles &lt;= 0) {
+			throw new IllegalArgumentException("本数は1以上を指定してください");
+		}
+		if (stock &lt; bottles) {
+			throw new IllegalArgumentException("在庫が足りません");
+		}
+		stock = stock - bottles;
+		System.out.println(drinkName + "を" + bottles + "本購入しました。");
+	}
+}</pre>
+
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">上記クラスをドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<p style="margin: 0 0 8px 0; font-size: 15px; color: #333;">下のプレーンテキストの貼り付け欄から、IDE へドラッグで取り込めます。</p>
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 280px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class VendingMachine {
+
+	// フィールド
+	String drinkName = "水";
+	int stock = 3;
+
+	// 引数なしのコンストラクタ（中身が空なので1行でよい）
+	public VendingMachine() {}
+
+	// 指定本数を購入する。本数が不正なら非チェック例外を投げる
+	public void buy(int bottles) {
+		if (bottles &lt;= 0) {
+			throw new IllegalArgumentException("本数は1以上を指定してください");
+		}
+		if (stock &lt; bottles) {
+			throw new IllegalArgumentException("在庫が足りません");
+		}
+		stock = stock - bottles;
+		System.out.println(drinkName + "を" + bottles + "本購入しました。");
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			3-4. チェック例外：在庫不足を「必ず処理させる」
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">独自のチェック例外 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">OutOfStockException</code> を定義し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dispense</code> から <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">throws</code> します。呼び出す側は <strong>try-catch か throws</strong> のどちらかが必要です。</p>
+
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">// チェック例外（Exception のサブクラス）
+public class OutOfStockException extends Exception {
+
+	public OutOfStockException(String message) {
+		super(message);
+	}
+}
+
+public class VendingMachineStock {
+
+	int stock = 2;
+
+	public VendingMachineStock() {}
+
+	// 在庫を減らす。足りなければチェック例外を投げる（呼び出し側に処理を強いる）
+	public void dispense(int bottles) throws OutOfStockException {
+		if (bottles &lt;= 0) {
+			throw new IllegalArgumentException("本数は1以上を指定してください");
+		}
+		if (stock &lt; bottles) {
+			String message = "在庫不足（必要:" + bottles + " 実在庫:" + stock + "）";
+			OutOfStockException ex = new OutOfStockException(message);
+			throw ex;
+		}
+		stock = stock - bottles;
+		System.out.println("販売OK。残り在庫=" + stock);
+	}
+}</pre>
+
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">OutOfStockException と VendingMachineStock をドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 360px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class OutOfStockException extends Exception {
+
+	public OutOfStockException(String message) {
+		super(message);
+	}
+}
+
+public class VendingMachineStock {
+
+	int stock = 2;
+
+	public VendingMachineStock() {}
+
+	public void dispense(int bottles) throws OutOfStockException {
+		if (bottles &lt;= 0) {
+			throw new IllegalArgumentException("本数は1以上を指定してください");
+		}
+		if (stock &lt; bottles) {
+			String message = "在庫不足（必要:" + bottles + " 実在庫:" + stock + "）";
+			OutOfStockException ex = new OutOfStockException(message);
+			throw ex;
+		}
+		stock = stock - bottles;
+		System.out.println("販売OK。残り在庫=" + stock);
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			3-5. try / catch / finally（main から呼ぶ）
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;">参照変数は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">vm</code> でそろえると読みやすい、というルールに合わせています。</p>
+
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">public class VendingMachineDemo {
+
+	public static void main(String[] args) {
+		VendingMachine vm = new VendingMachine();
+		try {
+			// 意図的に在庫より多く買おうとする例（非チェック）
+			vm.buy(10);
+		} catch (IllegalArgumentException e) {
+			System.out.println("購入できません: " + e.getMessage());
+		} finally {
+			System.out.println("処理ブロックを抜けます（finally）");
+		}
+
+		VendingMachineStock vmStock = new VendingMachineStock();
+		try {
+			vmStock.dispense(1);
+			vmStock.dispense(5);
+		} catch (OutOfStockException e) {
+			System.out.println("チェック例外を捕捉: " + e.getMessage());
+		}
+	}
+}</pre>
+
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">VendingMachineDemo をドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 320px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class VendingMachineDemo {
+
+	public static void main(String[] args) {
+		VendingMachine vm = new VendingMachine();
+		try {
+			vm.buy(10);
+		} catch (IllegalArgumentException e) {
+			System.out.println("購入できません: " + e.getMessage());
+		} finally {
+			System.out.println("処理ブロックを抜けます（finally）");
+		}
+
+		VendingMachineStock vmStock = new VendingMachineStock();
+		try {
+			vmStock.dispense(1);
+			vmStock.dispense(5);
+		} catch (OutOfStockException e) {
+			System.out.println("チェック例外を捕捉: " + e.getMessage());
+		}
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			3-6. 複数 catch の順序と multi-catch（|）
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;"><strong>順序</strong>：より具体的な型を上に、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Exception</code> のような広い型は<strong>最後</strong>。</p>
+			<p style="margin: 0 0 10px 0;"><strong>multi-catch</strong>：同じ復旧処理でよいとき、型を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">|</code> で並べます（catch パラメータは事実上 final 扱い）。</p>
+
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">public class MultiCatchSample {
+
+	public static void main(String[] args) {
+		String text = null;
+		try {
+			System.out.println(text.length());
+		} catch (NullPointerException | IllegalArgumentException e) {
+			System.out.println("引数や参照が不正: " + e.getClass().getSimpleName());
+		} catch (Exception e) {
+			System.out.println("その他: " + e.getMessage());
+		}
+	}
+}</pre>
+
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">MultiCatchSample をドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class MultiCatchSample {
+
+	public static void main(String[] args) {
+		String text = null;
+		try {
+			System.out.println(text.length());
+		} catch (NullPointerException | IllegalArgumentException e) {
+			System.out.println("引数や参照が不正: " + e.getClass().getSimpleName());
+		} catch (Exception e) {
+			System.out.println("その他: " + e.getMessage());
+		}
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
+		</div>
+
+		<h3 style="padding-left: 10px; color: #0033ff; font-size: 16px; margin-top: 20px; margin-bottom: 10px;">
+			3-7. try-with-resources（close を自動で呼ぶ）
+		</h3>
+		<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 10px 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">AutoCloseable</code>（多くは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Closeable</code>）を実装したオブジェクトを、try の丸括弧の中で宣言すると、ブロックを抜けるときに <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">close()</code> が呼ばれます。ファイルや DB 接続など「閉じ忘れがバグになるもの」で威力を発揮します。</p>
+
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 12px 0;">public class LogResource implements AutoCloseable {
+
+	public void writeLine(String line) {
+		System.out.println("[LOG] " + line);
+	}
+
+	@Override
+	public void close() {
+		System.out.println("[LOG] リソースを閉じました");
+	}
+}
+
+public class TryWithResourcesSample {
+
+	public static void main(String[] args) {
+		try (LogResource log = new LogResource()) {
+			log.writeLine("処理中");
+		}
+	}
+}</pre>
+
+			<details style="margin-top: 8px;">
+				<summary style="cursor: pointer; font-weight: bold; color: #555;">LogResource と TryWithResourcesSample をドラッグでコピー（クリックで開く）</summary>
+				<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+					<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+						<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+						<textarea readonly style="width: 100%; height: 320px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public class LogResource implements AutoCloseable {
+
+	public void writeLine(String line) {
+		System.out.println("[LOG] " + line);
+	}
+
+	@Override
+	public void close() {
+		System.out.println("[LOG] リソースを閉じました");
+	}
+}
+
+public class TryWithResourcesSample {
+
+	public static void main(String[] args) {
+		try (LogResource log = new LogResource()) {
+			log.writeLine("処理中");
+		}
+	}
+}</textarea>
+					</div>
+				</div>
+			</details>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			4. ラボ（10分チェックリスト）
+		</h2>
+
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin-bottom: 10px;"><strong>10分で終わる最小確認</strong></p>
+				<ol style="padding-left: 20px; margin: 0;">
+					<li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">VendingMachine#buy</code> で在庫不足を起こし、catch でメッセージが出ることを確認する。</li>
+					<li style="margin-bottom: 10px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">OutOfStockException</code> を使う <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dispense</code> を、main から try-catch で捕捉できることを確認する。</li>
+					<li style="margin-bottom: 10px;">finally に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">System.out.println</code> を1行入れ、例外の有無で必ず通ることを目で追う。</li>
+					<li style="margin-bottom: 10px;">multi-catch のブロックを一時的に入れ替え、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Exception</code> を先頭にするとコンパイルが通らない（または到達不能になる）ことを確認する。</li>
+					<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">TryWithResourcesSample</code> を実行し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">close</code> の行がブロック終了後に出ることを確認する。</li>
+				</ol>
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			5. まとめ
+		</h2>
+
+		<p style="margin: 0 0 10px 0;">例外は「実行中に起きた異常」を表すオブジェクトです。<strong>非チェック</strong>は呼び出し側に処理を強制しません。<strong>チェック</strong>はコンパイラが処理の存在をチェックします。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 10px 0;">try { 危ない処理 }
+catch (具体的な型 e) { 復旧やログ }
+catch (Exception e) { 最後の網 }
+finally { 後始末（ほぼ必ず） }
+
+try (リソース r = ...) { 処理 }  // 終わりで r.close()</pre>
+		<p style="margin: 0;">追加の問いは、同じフォルダの <strong>03-練習問題-Java例外処理.html</strong> で確認してください。</p>
+	</section>
+
+</div>

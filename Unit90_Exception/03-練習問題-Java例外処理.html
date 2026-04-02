@@ -1,0 +1,184 @@
+Java 例外処理・練習問題
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		Java 例外処理・練習問題
+	</h1>
+
+	<p style="margin-bottom: 15px;">まず手元で考えてから、ヒント・解答例を開いてください。コードは貼り付け欄から IDE へドラッグで取り込めます。</p>
+
+	<!-- ===== 問題1 ===== -->
+	<p style="margin-bottom: 5px;"><strong>問題1</strong>：チェック例外と非チェック例外（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">RuntimeException</code> 系）について、<strong>コンパイラが呼び出し側に「処理の記述」を強く求めるかどうか</strong>の観点で、それぞれ一言ずつ説明してください。</p>
+	<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+	<details style="margin-top: 8px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">「メソッドに <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">throws</code> が付く」「呼び出し側が try-catch か throws を書く必要がある」がどちらに当てはまるかで整理します。</p>
+		</div>
+	</details>
+	<details style="margin-top: 5px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="font-size:12px;color:#666;margin-bottom:5px;">【解説・確認用】</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">チェック例外：呼び出し側に try-catch または throws など、例外の処理経路をコンパイラがチェックしやすい（「処理を書かせる」側に寄せる）。
+
+非チェック例外（RuntimeException 系）：原則としてコンパイラは呼び出し側に try-catch を強制しない（実行時の前提崩れ・バグ寄りとして扱う）。</pre>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して Eclipse やメモ帳へドラッグしてください：</p>
+				<textarea readonly style="width: 100%; height: 120px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">チェック例外：呼び出し側に try-catch または throws など、例外の処理経路をコンパイラがチェックしやすい（「処理を書かせる」側に寄せる）。
+
+非チェック例外（RuntimeException 系）：原則としてコンパイラは呼び出し側に try-catch を強制しない（実行時の前提崩れ・バグ寄りとして扱う）。</textarea>
+			</div>
+		</div>
+	</details>
+
+	<!-- ===== 問題2 ===== -->
+	<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題2</strong>：次のコード片は<strong>コンパイルエラー</strong>になります。理由を「catch の順序」に関連づけて説明してください。</p>
+	<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+	<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 10px 0;">try {
+	work();
+} catch (Exception e) {
+	System.out.println("A");
+} catch (IllegalArgumentException e) {
+	System.out.println("B");
+}</pre>
+	<details style="margin-top: 8px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">IllegalArgumentException</code> は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Exception</code> のサブクラスです。上からマッチするとき、2つ目の catch は到達しますか。</p>
+		</div>
+	</details>
+	<details style="margin-top: 5px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="font-size:12px;color:#666;margin-bottom:5px;">【解説・確認用】</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">catch は上から順に「捕捉できる型か」を見る。Exception は IllegalArgumentException より広い親なので、先に Exception を書くと
+すべての例外がそこで捕捉される扱いになり、後ろの IllegalArgumentException には到達しない（到達不能コードとしてエラー）。</pre>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して Eclipse やメモ帳へドラッグしてください：</p>
+				<textarea readonly style="width: 100%; height: 100px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">catch は上から順に「捕捉できる型か」を見る。Exception は IllegalArgumentException より広い親なので、先に Exception を書くと
+すべての例外がそこで捕捉される扱いになり、後ろの IllegalArgumentException には到達しない（到達不能コードとしてエラー）。</textarea>
+			</div>
+		</div>
+	</details>
+
+	<!-- ===== 問題3 ===== -->
+	<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題3</strong>：次の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">main</code> の実行で、コンソールに表示される行を<strong>順番どおり</strong>すべて書いてください。</p>
+	<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+	<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 10px 0;">public class FinallyOrderSample {
+
+	public static void main(String[] args) {
+		try {
+			System.out.println("try");
+			throw new IllegalArgumentException("demo");
+		} catch (IllegalArgumentException e) {
+			System.out.println("catch");
+		} finally {
+			System.out.println("finally");
+		}
+		System.out.println("after");
+	}
+}</pre>
+	<details style="margin-top: 8px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">例外が出て catch に入ったあとも、finally は通ります。そのあと try ブロック全体の外の行へ進みます。</p>
+		</div>
+	</details>
+	<details style="margin-top: 5px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="font-size:12px;color:#666;margin-bottom:5px;">【解説・確認用】</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">try
+catch
+finally
+after</pre>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して Eclipse やメモ帳へドラッグしてください：</p>
+				<textarea readonly style="width: 100%; height: 70px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">try
+catch
+finally
+after</textarea>
+			</div>
+		</div>
+	</details>
+
+	<!-- ===== 問題4 ===== -->
+	<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題4</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">try ( ... ) { ... }</code> の丸括弧内で宣言したリソースは、ブロックを抜けるときに自動で呼ばれるメソッド名を書いてください。</p>
+	<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+	<details style="margin-top: 8px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">AutoCloseable</code> が約束しているメソッドです。</p>
+		</div>
+	</details>
+	<details style="margin-top: 5px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="font-size:12px;color:#666;margin-bottom:5px;">【解説・確認用】</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">close()</pre>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して Eclipse やメモ帳へドラッグしてください：</p>
+				<textarea readonly style="width: 100%; height: 55px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">close()</textarea>
+			</div>
+		</div>
+	</details>
+
+	<!-- ===== 問題5 ===== -->
+	<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題5</strong>：社員の年齢をセットする <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Employee</code> です。空欄（a）（b）に入る語句を答え、（c）に適切な型の例外オブジェクトを生成する式を1つ書いてください（非チェックでよい）。</p>
+	<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+	<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 10px 0;">public class Employee {
+
+	private int age;
+
+	public Employee() {}
+
+	public void setAge(int age) {
+		if (age &lt; 0) {
+			(a) new (b)("年齢は0以上");
+		}
+		this.age = age;
+	}
+
+	public int getAge() {
+		return age;
+	}
+}</pre>
+	<details style="margin-top: 8px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">不正な引数に対して投げる定番の非チェック例外クラス名を思い出してください。(a) はキーワード1語です。</p>
+		</div>
+	</details>
+	<details style="margin-top: 5px;">
+		<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+		<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+			<p style="font-size:12px;color:#666;margin-bottom:5px;">【解説・確認用】</p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">(a) throw
+(b) IllegalArgumentException
+(c) new IllegalArgumentException("年齢は0以上")
+
+完成形のメソッド例：
+	public void setAge(int age) {
+		if (age &lt; 0) {
+			throw new IllegalArgumentException("年齢は0以上");
+		}
+		this.age = age;
+	}</pre>
+			<div style="background: #e6f7ff; padding: 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+				<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して Eclipse やメモ帳へドラッグしてください：</p>
+				<textarea readonly style="width: 100%; height: 200px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">(a) throw
+(b) IllegalArgumentException
+(c) new IllegalArgumentException("年齢は0以上")
+
+public void setAge(int age) {
+	if (age < 0) {
+		throw new IllegalArgumentException("年齢は0以上");
+	}
+	this.age = age;
+}</textarea>
+			</div>
+		</div>
+	</details>
+
+</div>
