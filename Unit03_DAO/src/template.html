@@ -64,7 +64,167 @@ Entity = DBの行（テーブル向け）</pre>
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			4. データの旅（保存・取得）
+			4. 写経とは？（体で覚える）
+		</h2>
+		<div style="margin: 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">プログラミング学習における<strong>写経</strong>は、<strong>ソースコードを見たまま打つことで、頭でなく体で覚える学習方法</strong>という理解でお願いします。下のサンプルは Eclipse などにそのまま写して動かす前提です。</p>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			5. DAOクラスの基本型（DaoBase・ItemEntity・ItemDao）
+		</h2>
+		<div style="margin: 0 0 15px 0; padding: 15px; background-color: #f0f8ff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<ul style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 6px;"><strong>接続情報</strong>は設計にもよるが、ここでは親クラス <strong>DaoBase</strong> に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection()</code> を用意して集約する。</li>
+				<li style="margin-bottom: 6px;"><strong>テーブルごとに1クラス</strong>：例として <strong>items</strong> 用に <strong>ItemDao</strong> を用意する。</li>
+				<li style="margin-bottom: 6px;"><strong>CRUD</strong>：1件検索・全件検索・1件挿入・1件更新・1件削除を ItemDao に用意する（参照は <strong>ItemEntity</strong> を返す、更新は件数を返す）。</li>
+				<li style="margin-bottom: 0;">残りのメソッド（findAll / update / delete など）の穴埋めは、練習問題で完成させる。</li>
+			</ul>
+		</div>
+
+		<details open style="margin-top: 10px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">DaoBase（ドラッグでコピー・クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 200px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+/**
+ * DAO 共通クラス：接続情報を1か所に集約する。
+ */
+public class DaoBase {
+
+	// TODO: 自分の環境に合わせて修正
+	private static final String URL = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+	private static final String USER = "root";
+	private static final String PASS = "password";
+
+	/**
+	 * DB への接続を取得する。
+	 */
+	protected Connection getConnection() throws SQLException {
+		return DriverManager.getConnection(URL, USER, PASS);
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<details open style="margin-top: 10px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">ItemEntity（ドラッグでコピー・クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 320px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">/**
+ * items テーブルの1行を表すクラス（Entity）。
+ */
+public class ItemEntity {
+
+	// フィールド
+	private int itemId;
+	private String category;
+	private String itemName;
+	private int unitPrice;
+
+	/**
+	 * コンストラクタ（全フィールドを受け取る）
+	 */
+	public ItemEntity(int itemId, String category, String itemName, int unitPrice) {
+		this.itemId = itemId;
+		this.category = category;
+		this.itemName = itemName;
+		this.unitPrice = unitPrice;
+	}
+
+	// getter
+	public int getItemId() {
+		return itemId;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public int getUnitPrice() {
+		return unitPrice;
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+
+		<details open style="margin-top: 10px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">ItemDao：代表メソッド（findById と insert の完成例）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 10px 0;">メソッドは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">throws SQLException</code> とし、例外の詳細は正課外の例外処理オプションを参照してください。</p>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
+					<textarea readonly style="width: 100%; height: 420px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class ItemDao extends DaoBase {
+
+	/**
+	 * 1件検索：主キー item_id で1行を取得する。
+	 */
+	public ItemEntity findById(int itemId) throws SQLException {
+		String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
+
+		try (Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, itemId);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return new ItemEntity(
+							rs.getInt("item_id"),
+							rs.getString("category"),
+							rs.getString("item_name"),
+							rs.getInt("unit_price"));
+				}
+				return null;
+			}
+		}
+	}
+
+	/**
+	 * 1件挿入：新しい商品行を追加する。
+	 */
+	public int insert(ItemEntity item) throws SQLException {
+		String sql = "INSERT INTO items (item_id, category, item_name, unit_price) VALUES (?, ?, ?, ?)";
+
+		try (Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, item.getItemId());
+			ps.setString(2, item.getCategory());
+			ps.setString(3, item.getItemName());
+			ps.setInt(4, item.getUnitPrice());
+
+			return ps.executeUpdate();
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+		<p style="margin: 0; font-size: 13px; color: #555;">完全版のソースは <strong>Unit03_DAO/src</strong> フォルダ（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemEntity.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao.java</code>）にも同じ内容を置いています。</p>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			6. データの旅（保存・取得）
 		</h2>
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -81,7 +241,7 @@ Entity = DBの行（テーブル向け）</pre>
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			5. PreparedStatement：? と setXxx の対応
+			7. PreparedStatement：? と setXxx の対応
 		</h2>
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -115,7 +275,7 @@ try (Connection con = DriverManager.getConnection(URL, USER, PASS);
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			6. 最小のミッション（DAOへ切り出す）
+			8. 最小のミッション（DAOへ切り出す）
 		</h2>
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -132,7 +292,7 @@ try (Connection con = DriverManager.getConnection(URL, USER, PASS);
 
 	<section style="margin-bottom: 10px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			7. 例外処理はオプション（必要なら）
+			9. 例外処理はオプション（必要なら）
 		</h2>
 		<p style="margin: 0;">この回は <strong>例外処理の詳細を必須にしない</strong> ため、深掘りは正課外の [オプション講座：例外処理] を使ってください。</p>
 	</section>

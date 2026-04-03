@@ -58,3 +58,9 @@ Entity = DBの行（テーブル向け）
 
 - DTOを1つ作り、DAOの戻り値をDTOに詰めて返す（列→フィールドの写経）
 
+---
+
+## 教材（Unit03_DAO）
+
+- **講義テキスト・穴埋め練習・Javaサンプル（DaoBase / ItemEntity / ItemDao）**: リポジトリ内 `Unit03_DAO/` を参照（CRUD の写経と参照系・更新系の穴埋め問題あり）。
+
