@@ -10,7 +10,7 @@
 			<div style="background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<p style="margin: 0 0 10px 0;"><strong>ItemDao</strong> に CRUD をそろえ、<strong>PreparedStatement</strong> の <strong>?</strong> と <strong>setXxx</strong> を体で覚える練習です。</p>
 				<ul style="padding-left: 20px; margin: 0;">
-					<li style="margin-bottom: 6px;">前提：<strong>DaoBase</strong> と <strong>ItemEntity</strong> は本編または <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit03_DAO/src</code> をそのまま使う。</li>
+					<li style="margin-bottom: 6px;">前提：<strong>DaoBase</strong> と <strong>ItemDto</strong> は本編または <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit03_DAO/src</code> をそのまま使う。</li>
 					<li style="margin-bottom: 6px;">題材は <strong>items</strong>（item_id, category, item_name, unit_price）。</li>
 					<li style="margin-bottom: 0;">穴埋めは<strong>問題文の指示</strong>で行い、解答欄のコードを写経して完成させる。</li>
 				</ul>
@@ -27,7 +27,7 @@
 			<li style="margin-bottom: 4px;">SQL の <strong>???</strong>：SELECT する列名（4列）</li>
 			<li style="margin-bottom: 4px;"><strong>???</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">PreparedStatement</code> に渡す SQL 文字列全体</li>
 			<li style="margin-bottom: 4px;"><strong>???</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ps.set???</code> で主キーをバインド（番号は 1）</li>
-			<li style="margin-bottom: 0;"><strong>???</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemEntity</code> のコンストラクタに渡す <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.get???</code> の組み合わせ</li>
+			<li style="margin-bottom: 0;"><strong>???</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto</code> のコンストラクタに渡す <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.get???</code> の組み合わせ</li>
 		</ul>
 		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
 		<details style="margin-top: 8px;">
@@ -39,7 +39,7 @@
 		<details style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public ItemEntity findById(int itemId) throws SQLException {
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public ItemDto findById(int itemId) throws SQLException {
 	String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
 
 	try (Connection con = getConnection();
@@ -49,7 +49,7 @@
 
 		try (ResultSet rs = ps.executeQuery()) {
 			if (rs.next()) {
-				return new ItemEntity(
+				return new ItemDto(
 						rs.getInt("item_id"),
 						rs.getString("category"),
 						rs.getString("item_name"),
@@ -61,7 +61,7 @@
 }</pre>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 280px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public ItemEntity findById(int itemId) throws SQLException {
+					<textarea readonly style="width: 100%; height: 280px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public ItemDto findById(int itemId) throws SQLException {
 	String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
 
 	try (Connection con = getConnection();
@@ -71,7 +71,7 @@
 
 		try (ResultSet rs = ps.executeQuery()) {
 			if (rs.next()) {
-				return new ItemEntity(
+				return new ItemDto(
 						rs.getInt("item_id"),
 						rs.getString("category"),
 						rs.getString("item_name"),
@@ -90,7 +90,7 @@
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
 			②【問題】更新系（基礎）— insert
 		</h2>
-		<p style="margin: 0 0 8px 0;"><strong>やること</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">insert(ItemEntity item)</code> を実装する。次の <strong>???</strong> を埋めよ。</p>
+		<p style="margin: 0 0 8px 0;"><strong>やること</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">insert(ItemDto item)</code> を実装する。次の <strong>???</strong> を埋めよ。</p>
 		<ul style="padding-left: 20px; margin: 0 0 12px 0; font-size: 14px;">
 			<li style="margin-bottom: 4px;"><strong>???</strong>：INSERT 文の列と VALUES の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">?</code> の個数（4つ）</li>
 			<li style="margin-bottom: 4px;"><strong>???</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ps.setInt</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setString</code> の順番（1〜4番目）</li>
@@ -106,7 +106,7 @@
 		<details style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public int insert(ItemEntity item) throws SQLException {
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public int insert(ItemDto item) throws SQLException {
 	String sql = "INSERT INTO items (item_id, category, item_name, unit_price) VALUES (?, ?, ?, ?)";
 
 	try (Connection con = getConnection();
@@ -122,7 +122,7 @@
 }</pre>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public int insert(ItemEntity item) throws SQLException {
+					<textarea readonly style="width: 100%; height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public int insert(ItemDto item) throws SQLException {
 	String sql = "INSERT INTO items (item_id, category, item_name, unit_price) VALUES (?, ?, ?, ?)";
 
 	try (Connection con = getConnection();
@@ -161,10 +161,10 @@
 		<details style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public List&lt;ItemEntity&gt; findByCategoryAndMinPriceOrderByPrice(String category, int minPrice) throws SQLException {
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public List&lt;ItemDto&gt; findByCategoryAndMinPriceOrderByPrice(String category, int minPrice) throws SQLException {
 	String sql = "SELECT item_id, category, item_name, unit_price FROM items "
 			+ "WHERE category = ? AND unit_price &gt;= ? ORDER BY unit_price ASC";
-	List&lt;ItemEntity&gt; list = new ArrayList&lt;&gt;();
+	List&lt;ItemDto&gt; list = new ArrayList&lt;&gt;();
 
 	try (Connection con = getConnection();
 			PreparedStatement ps = con.prepareStatement(sql)) {
@@ -174,7 +174,7 @@
 
 		try (ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
-				list.add(new ItemEntity(
+				list.add(new ItemDto(
 						rs.getInt("item_id"),
 						rs.getString("category"),
 						rs.getString("item_name"),
@@ -186,10 +186,10 @@
 }</pre>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 300px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public List&lt;ItemEntity&gt; findByCategoryAndMinPriceOrderByPrice(String category, int minPrice) throws SQLException {
+					<textarea readonly style="width: 100%; height: 300px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public List&lt;ItemDto&gt; findByCategoryAndMinPriceOrderByPrice(String category, int minPrice) throws SQLException {
 	String sql = "SELECT item_id, category, item_name, unit_price FROM items "
 			+ "WHERE category = ? AND unit_price &gt;= ? ORDER BY unit_price ASC";
-	List&lt;ItemEntity&gt; list = new ArrayList&lt;&gt;();
+	List&lt;ItemDto&gt; list = new ArrayList&lt;&gt;();
 
 	try (Connection con = getConnection();
 			PreparedStatement ps = con.prepareStatement(sql)) {
@@ -199,7 +199,7 @@
 
 		try (ResultSet rs = ps.executeQuery()) {
 			while (rs.next()) {
-				list.add(new ItemEntity(
+				list.add(new ItemDto(
 						rs.getInt("item_id"),
 						rs.getString("category"),
 						rs.getString("item_name"),
@@ -218,7 +218,7 @@
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
 			④【問題】更新系（発展）— update（全列）
 		</h2>
-		<p style="margin: 0 0 8px 0;"><strong>やること</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">update(ItemEntity item)</code> を実装する。主キー <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_id</code> で行を特定し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">category</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code> を更新する。</p>
+		<p style="margin: 0 0 8px 0;"><strong>やること</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">update(ItemDto item)</code> を実装する。主キー <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_id</code> で行を特定し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">category</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code> を更新する。</p>
 		<ul style="padding-left: 20px; margin: 0 0 12px 0; font-size: 14px;">
 			<li style="margin-bottom: 4px;"><strong>???</strong>：SET 句と WHERE 句の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">?</code> の並び（SET が1〜3、WHERE が4）</li>
 			<li style="margin-bottom: 0;"><strong>???</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate()</code> の戻り値を返す</li>
@@ -233,7 +233,7 @@
 		<details style="margin-top: 5px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public int update(ItemEntity item) throws SQLException {
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin-bottom: 10px;">public int update(ItemDto item) throws SQLException {
 	String sql = "UPDATE items SET category = ?, item_name = ?, unit_price = ? WHERE item_id = ?";
 
 	try (Connection con = getConnection();
@@ -249,7 +249,7 @@
 }</pre>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public int update(ItemEntity item) throws SQLException {
+					<textarea readonly style="width: 100%; height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public int update(ItemDto item) throws SQLException {
 	String sql = "UPDATE items SET category = ?, item_name = ?, unit_price = ? WHERE item_id = ?";
 
 	try (Connection con = getConnection();

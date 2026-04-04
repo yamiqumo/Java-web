@@ -52,6 +52,10 @@
 			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_04_three-boxes_dao-dto-entity.png" alt="DAO/DTO/Entityの3箱と役割" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
 		</div>
 
+		<div style="margin: 15px 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">上の図は、上流から見たときの<strong>役割の分け方（DAO / DTO / Entity の3箱）</strong>を示す概念図です。<strong>この回の写経・サンプルコードでは、Entity と DTO を同一視し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto</code>（JavaBeans）1 クラスだけ</strong>で進めます。</p>
+		</div>
+
 		<details open style="margin-top: 10px;">
 			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">写経（Service → DAO → DB）</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -73,13 +77,21 @@ Entity = DBの行（テーブル向け）</pre>
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			5. DAOクラスの基本型（DaoBase・ItemEntity・ItemDao）
+			5. DAOクラスの基本型（DaoBase・ItemDto・ItemDao）
 		</h2>
+		<div style="margin: 0 0 15px 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0;"><strong>（参考）Entity と DTO をクラスとして分ける場合</strong></p>
+			<ul style="padding-left: 20px; margin: 0 0 10px 0;">
+				<li style="margin-bottom: 6px;"><strong>メリット</strong>：例として、パスワードのハッシュなど、画面や公開 API に載せたくない列は、DB に近い側（いわゆる Entity 側）にだけ保持し、外に運ぶ DTO には含めない、といった切り分けがしやすい。</li>
+				<li style="margin-bottom: 0;"><strong>デメリット</strong>：クラスやマッピング（詰め替え）が増え、名前の使い分けも悩みやすくなる。</li>
+			</ul>
+			<p style="margin: 0; font-size: 13px; color: #555;">大規模なアプリではこのように分けることがありますが、<strong>本講義規模の JDBC では次の ItemDto（JavaBeans）だけで十分</strong>です。</p>
+		</div>
 		<div style="margin: 0 0 15px 0; padding: 15px; background-color: #f0f8ff; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<ul style="padding-left: 20px; margin: 0;">
 				<li style="margin-bottom: 6px;"><strong>接続情報</strong>は設計にもよるが、ここでは親クラス <strong>DaoBase</strong> に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection()</code> を用意して集約する。</li>
 				<li style="margin-bottom: 6px;"><strong>テーブルごとに1クラス</strong>：例として <strong>items</strong> 用に <strong>ItemDao</strong> を用意する。</li>
-				<li style="margin-bottom: 6px;"><strong>CRUD</strong>：1件検索・全件検索・1件挿入・1件更新・1件削除を ItemDao に用意する（参照は <strong>ItemEntity</strong> を返す、更新は件数を返す）。</li>
+				<li style="margin-bottom: 6px;"><strong>CRUD</strong>：1件検索・全件検索・1件挿入・1件更新・1件削除を ItemDao に用意する（参照は <strong>ItemDto</strong> を返す、更新は件数を返す）。</li>
 				<li style="margin-bottom: 0;">残りのメソッド（findAll / update / delete など）の穴埋めは、練習問題で完成させる。</li>
 			</ul>
 		</div>
@@ -115,46 +127,60 @@ public class DaoBase {
 		</details>
 
 		<details open style="margin-top: 10px;">
-			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">ItemEntity（ドラッグでコピー・クリックで開く）</summary>
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">ItemDto（JavaBeans・ドラッグでコピー・クリックで開く）</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 320px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">/**
- * items テーブルの1行を表すクラス（Entity）。
+					<textarea readonly style="width: 100%; height: 480px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">/**
+ * items テーブルの1行を表す DTO（本講義では Entity と同一視）。
  */
-public class ItemEntity {
+public class ItemDto {
 
-	// フィールド
 	private int itemId;
 	private String category;
 	private String itemName;
 	private int unitPrice;
 
-	/**
-	 * コンストラクタ（全フィールドを受け取る）
-	 */
-	public ItemEntity(int itemId, String category, String itemName, int unitPrice) {
+	public ItemDto() {
+	}
+
+	public ItemDto(int itemId, String category, String itemName, int unitPrice) {
 		this.itemId = itemId;
 		this.category = category;
 		this.itemName = itemName;
 		this.unitPrice = unitPrice;
 	}
 
-	// getter
 	public int getItemId() {
 		return itemId;
+	}
+
+	public void setItemId(int itemId) {
+		this.itemId = itemId;
 	}
 
 	public String getCategory() {
 		return category;
 	}
 
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
 	public String getItemName() {
 		return itemName;
 	}
 
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
 	public int getUnitPrice() {
 		return unitPrice;
+	}
+
+	public void setUnitPrice(int unitPrice) {
+		this.unitPrice = unitPrice;
 	}
 }</textarea>
 				</div>
@@ -177,7 +203,7 @@ public class ItemDao extends DaoBase {
 	/**
 	 * 1件検索：主キー item_id で1行を取得する。
 	 */
-	public ItemEntity findById(int itemId) throws SQLException {
+	public ItemDto findById(int itemId) throws SQLException {
 		String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
 
 		try (Connection con = getConnection();
@@ -187,7 +213,7 @@ public class ItemDao extends DaoBase {
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					return new ItemEntity(
+					return new ItemDto(
 							rs.getInt("item_id"),
 							rs.getString("category"),
 							rs.getString("item_name"),
@@ -201,7 +227,7 @@ public class ItemDao extends DaoBase {
 	/**
 	 * 1件挿入：新しい商品行を追加する。
 	 */
-	public int insert(ItemEntity item) throws SQLException {
+	public int insert(ItemDto item) throws SQLException {
 		String sql = "INSERT INTO items (item_id, category, item_name, unit_price) VALUES (?, ?, ?, ?)";
 
 		try (Connection con = getConnection();
@@ -219,7 +245,7 @@ public class ItemDao extends DaoBase {
 				</div>
 			</div>
 		</details>
-		<p style="margin: 0; font-size: 13px; color: #555;">完全版のソースは <strong>Unit03_DAO/src</strong> フォルダ（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemEntity.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao.java</code>）にも同じ内容を置いています。</p>
+		<p style="margin: 0; font-size: 13px; color: #555;">完全版のソースは <strong>Unit03_DAO/src</strong> フォルダ（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao.java</code>）にも同じ内容を置いています。</p>
 	</section>
 
 	<section style="margin-bottom: 30px;">
