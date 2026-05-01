@@ -1,6 +1,8 @@
-# 第3回 DAOパターンと安全性（2026/04/08・Online）
+# 第3回 DAO（参照系）と安全性（2026/04/08・Online）
 
-**前提（推奨）**: 例外の基礎は正課外の [オプション講座：例外処理](optional-exception-handling.md) を推奨する（未受講でも第3回は進められるが、JDBC の `catch` 理解が楽になる）。
+**前提（強く推奨）**: [例外処理](optional-exception-handling.md)（教材: `Unit90_Exception`）を **第3回の直前**に実施しておく。`SQLException` と try-with-resources の意味がつかみやすくなる。
+
+**第4回との分担**: 今日は **SELECT（参照系）** のみ。INSERT / UPDATE / DELETE と **トランザクション**は [第4回 DAO（更新系）](unit04.md)（`Unit04_DAO_Update`）で扱う。
 
 ## 0. 5分間プレゼン（先に宣言）
 
@@ -11,15 +13,15 @@
 
 ## 1. 到達目標（最小）
 
-- DAOに「DBとの会話」を集約する意味を説明できる
+- DAOに「DBとの会話（参照）」を集約する意味を説明できる
 - `PreparedStatement` の「値を埋める位置」を説明できる
-- 画面（将来）からDBまでの旅を“箱と矢印”で言える
+- `emps`（単表）と `depts`+`emps`（関連）の SELECT を DAO に閉じて実行できる
 
 ---
 
 ## 2. 本日のアーキテクチャ位置づけ
 
-- 今日は **DAO（DB担当窓口）** を固定し、上流（Servlet/Service）と切り離す回。
+- 今日は **DAO（DB担当窓口）** を固定し、上流（Servlet/Service）と切り離す回。題材は **部署・社員（`depts` / `emps`）**。
 
 ---
 
@@ -51,16 +53,17 @@ Entity = DBの行（テーブル向け）
 
 ### 5-1. 最小タスク（10分）
 
-- 直書きJDBCコードをDAOクラスに移し、呼び出し側は1行呼ぶだけにする
-- 1つのSQLを `PreparedStatement` にして、文字列連結を消す
+- `EmpDao` の `findById` または `findAll` を写経し、コンソールに1件または全件を表示する
+- SQL は `PreparedStatement` とし、文字列連結で値を埋め込まない
 
 ### 5-2. 余力があれば（拡張）
 
-- DTOを1つ作り、DAOの戻り値をDTOに詰めて返す（列→フィールドの写経）
+- `03-練習問題-DAO参照系（emps-depts）.html` の **発展（JOIN）** に挑戦する
 
 ---
 
 ## 教材（Unit03_DAO）
 
-- **講義テキスト・穴埋め練習・Javaサンプル（DaoBase / ItemDto / ItemDao）**: リポジトリ内 `Unit03_DAO/` を参照（CRUD の写経と参照系・更新系の穴埋め問題あり）。
-
+- **講義テキスト**: `Unit03_DAO/01-テキスト-DAOパターンと安全性.html`（穴埋め写経つき）
+- **練習問題**: `Unit03_DAO/03-練習問題-DAO参照系（emps-depts）.html`
+- **Java サンプル**: `Unit03_DAO/src/`（`DaoBase.java` / `EmpDto.java` / `EmpDao.java`）。更新系メソッドは第4回で使うためクラス内に含まれるが、第3回の講義では **参照メソッドを中心**とする。

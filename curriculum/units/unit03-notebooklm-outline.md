@@ -1,4 +1,4 @@
-# 第3回 DAOパターンと安全性（NotebookLM 用 原稿）
+# 第3回 DAO（参照系）と安全性（NotebookLM 用 原稿）
 
 ## 0. 5分間プレゼン（先に宣言）
 
@@ -9,9 +9,9 @@
 
 ## 1. 到達目標（最小）
 
-- DAOに「DBとの会話」を集約する意味を説明できる
+- DAOに「DBとの会話（参照）」を集約する意味を説明できる
 - `PreparedStatement` の「値を埋める位置」を説明できる
-- 画面（将来）からDBまでの旅を“箱と矢印”で言える
+- `emps` 単表と `depts`+`emps`（JOIN）の SELECT を DAO に閉じて実行できる
 
 ---
 
@@ -19,6 +19,7 @@
 
 - 今日の主役は **DAO（DB担当窓口）**
 - 上流（Servletではなく、呼び出し側としてのService/画面相当）と切り離して考える
+- **INSERT / UPDATE / DELETE とトランザクション**は第4回（`Unit04_DAO_Update`）へ先送り
 
 ---
 
@@ -46,12 +47,12 @@ Entity = DBの行（テーブル向け）
 
 ---
 
-## 5. 例題の題材：items中心（ECサイトの想像）
+## 5. 例題の題材：emps / depts（社員・部署）
 
-- 基本例は **`items`**（商品一覧・検索・登録）で統一する
-- `emps`（社員などの関連テーブル）は、必要なときだけ発展として扱う
+- 基本は **`emps`** の単表 SELECT、発展は **`depts` と JOIN** して部署名を取る
+- DTO は **`EmpDto`**（`deptName` は JOIN 時のみ）
 
-【図】「itemsをSELECT/INSERTすると、DAOがDTO/Entityに詰め替える」流れを1枚で描く
+【図】「emps を SELECT し、DAO が EmpDto に詰め替える」「JOIN で dept_name を足す」流れを1枚で描く
 
 ---
 
@@ -69,17 +70,16 @@ Entity = DBの行（テーブル向け）
 
 ### 7-1. 最小タスク（10分）
 
-- 直書きJDBCコードをDAOクラスに移し、呼び出し側は「1行呼ぶだけ」にする
-- 1つのSQLを `PreparedStatement` にして、文字列連結を消す
+- `EmpDao` の `findById` または `findAll` を写経し、結果を表示する
+- SQL は `PreparedStatement` にし、文字列連結を消す
 
 ### 7-2. 余力があれば（拡張）
 
-- DTOを1つ作り、DAOの戻り値をDTOに詰めて返す（列→フィールドの写経）
+- `03-練習問題-DAO参照系（emps-depts）.html` の JOIN 問題に挑戦する
 
 ---
 
-## 8. オプション講座（例外処理）
+## 8. 例外処理（第3回前・強く推奨）
 
-- JDBCでは `catch` や `try-with-resources` を理解しておくと進みやすい
-- 詳細は正課外の [オプション講座：例外処理](optional-exception-handling.md) を参照
-
+- JDBC では `catch` や `try-with-resources` を先に押さえると `SQLException` が読みやすい
+- 教材: `Unit90_Exception`、[optional-exception-handling.md](optional-exception-handling.md)

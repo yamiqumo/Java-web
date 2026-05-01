@@ -1,0 +1,224 @@
+DAO 練習問題（参照系・emps / depts）〜EmpDao と PreparedStatement〜
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		DAO 練習問題（参照系・emps / depts）〜EmpDao と PreparedStatement〜
+	</h1>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			この演習の進め方（3ステップ）
+		</h2>
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<ol style="padding-left: 20px; margin: 0;">
+					<li style="margin-bottom: 8px;"><strong>Step 1</strong>：講義テキストの確認・穴埋めで <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDto</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> の型を体に覚えさせる。</li>
+					<li style="margin-bottom: 8px;"><strong>Step 2（基本）</strong>：<strong>emps 単表</strong>だけを対象に、DAO メソッド（または同等の SQL）で取得・表示する。</li>
+					<li style="margin-bottom: 0;"><strong>Step 3（発展）</strong>：<strong>depts と emps を JOIN</strong> し、部署名を含めて取得する。</li>
+				</ol>
+				<p style="margin: 12px 0 0 0; font-size: 13px; color: #555;"><strong>INSERT / UPDATE / DELETE</strong> は第4回（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit04_DAO_Update</code>）で扱います。</p>
+			</div>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			利用するテーブル（lesson DB）
+		</h2>
+		<p style="margin-bottom: 10px;">「環境構築：MySQL」の手順で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">USE lesson;</code> のうえで流し込んだ <strong>depts</strong> / <strong>emps</strong> を使います。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">fname</code>＝苗字、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lname</code>＝名前です。</p>
+
+		<div style="margin: 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0 0 8px 0;"><strong>depts</strong></p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 15px 0;">dept_no | dept_name | area
+--------+-----------+------
+10      | 営業部    | 東京
+20      | 開発部    | 大阪
+30      | 人事部    | 名古屋
+40      | 総務部    | 福岡</pre>
+
+			<p style="margin: 0 0 8px 0;"><strong>emps</strong></p>
+			<pre style="background-color: #fdf5e6; color: #333; padding: 12px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">emp_id | fname | lname | salary | dept_no
+-------+-------+-------+--------+--------
+1      | 山田  | 太郎  | 250000 | 10
+2      | 佐藤  | 花子  | 320000 | 20
+3      | 田中  | 次郎  | 280000 | 20
+4      | 伊藤  | 梅子  | 220000 | 40
+5      | 渡辺  | 健太  | 350000 | 10
+6      | 小林  | 良子  | 290000 | 30
+7      | 加藤  | 進    | 310000 | 20
+8      | 木村  | 光    | 240000 | 10
+9      | 斎藤  | 恵    | 270000 | 30
+10     | 清水  | 隆    | 330000 | 20</pre>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			基本問題（emps のみ・SELECT）
+		</h2>
+		<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0033ff; margin-bottom: 20px;">
+			<p style="margin: 0;"><strong>目標</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> のメソッドを呼び出すか、同じ SQL を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">PreparedStatement</code> で実行し、結果をコンソールに出す。</p>
+		</div>
+
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題1</strong>：全件表示 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao#findAll</code> を使い、全員の苗字・名前・給与を1行ずつ表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">main</code> で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">new EmpDao().findAll()</code> を呼び、返った <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">List&lt;EmpDto&gt;</code> を拡張 for で回す。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">throws SQLException</code> は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">main</code> に付けてよい。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">public static void main(String[] args) throws Exception {
+	EmpDao dao = new EmpDao();
+	for (EmpDto e : dao.findAll()) {
+		System.out.println(e.getFname() + e.getLname() + " " + e.getSalary());
+	}
+}</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題2</strong>：1件取得 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id = 7</code> の社員を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findById</code> で取得し、見つからない場合は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code> と分かるように表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">if (e == null)</code> の分岐を書く。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">EmpDto e = new EmpDao().findById(7);
+if (e == null) {
+	System.out.println("該当なし");
+} else {
+	System.out.println(e.getFname() + e.getLname() + " " + e.getSalary());
+}</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題3</strong>：部署で絞り込み — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dept_no = 20</code>（開発部）の社員だけを <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findByDeptNo</code> で取得し、苗字と名前を表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findByDeptNo</code> がまだ無い場合は、講義テキストの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findById</code> をコピーして SQL とバインドだけ変えて実装する。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">for (EmpDto e : new EmpDao().findByDeptNo(20)) {
+	System.out.println(e.getFname() + e.getLname());
+}</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題4</strong>：Java で集計 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findAll</code> で取得したリストから、<strong>給与が 300000 以上</strong>の人数を数えて表示せよ（SQL の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">COUNT</code> は使わず、ループで数える）。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">カウンタ変数を用意し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getSalary() &gt;= 300000</code> のときだけ増やす。答えは 4 名。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">int n = 0;
+for (EmpDto e : new EmpDao().findAll()) {
+	if (e.getSalary() &gt;= 300000) {
+		n++;
+	}
+}
+System.out.println("300000以上: " + n + "名");</pre>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			発展問題（depts と emps・JOIN）
+		</h2>
+		<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 5px solid #0033ff; margin-bottom: 20px;">
+			<p style="margin: 0;"><strong>目標</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">JOIN</code> で部署名を取り、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDto#getDeptName</code> に載せる。</p>
+		</div>
+
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題5</strong>：部署名つき一覧 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao#findAllWithDeptName</code> を使い、「苗字＋名前＋部署名＋給与」を1行ずつ表示せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">SQL は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emps e JOIN depts d ON e.dept_no = d.dept_no</code>。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.getString("dept_name")</code> を DTO の第6引数に渡す。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">for (EmpDto e : new EmpDao().findAllWithDeptName()) {
+	System.out.println(
+			e.getFname() + e.getLname() + " " + e.getDeptName() + " " + e.getSalary());
+}</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題6</strong>：メソッド追加 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findByIdWithDeptName(int empId)</code> を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> に新規実装せよ。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">JOIN</code> し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">WHERE e.emp_id = ?</code> で1件に絞る。見つからなければ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code>。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findById</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findAllWithDeptName</code> の SQL を組み合わせる。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例（メソッド本体のイメージ）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">String sql =
+	"SELECT e.emp_id, e.fname, e.lname, e.salary, e.dept_no, d.dept_name "
+			+ "FROM emps e JOIN depts d ON e.dept_no = d.dept_no WHERE e.emp_id = ?";
+try (Connection con = getConnection();
+		PreparedStatement ps = con.prepareStatement(sql)) {
+	ps.setInt(1, empId);
+	try (ResultSet rs = ps.executeQuery()) {
+		if (!rs.next()) {
+			return null;
+		}
+		return new EmpDto(
+				rs.getInt("emp_id"),
+				rs.getString("fname"),
+				rs.getString("lname"),
+				rs.getInt("salary"),
+				rs.getInt("dept_no"),
+				rs.getString("dept_name"));
+	}
+}</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題7</strong>：部署ごとの人数 — <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findAllWithDeptName</code> の結果だけを使い（SQL で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">GROUP BY</code> しない）、<strong>部署名ごと</strong>の人数をコンソールに出力せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Map&lt;String, Integer&gt;</code> に部署名をキーにして件数を足す。発展として後日 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">GROUP BY</code> を DAO に書く形に置き換えてもよい。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+for (EmpDto e : new EmpDao().findAllWithDeptName()) {
+	String d = e.getDeptName();
+	map.put(d, map.getOrDefault(d, 0) + 1);
+}
+for (Map.Entry&lt;String, Integer&gt; en : map.entrySet()) {
+	System.out.println(en.getKey() + " : " + en.getValue() + "名");
+}</pre>
+				<p style="margin: 10px 0 0 0; font-size: 13px; color: #555;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">import java.util.HashMap; import java.util.Map;</code> が必要。</p>
+			</div>
+		</details>
+	</section>
+</div>

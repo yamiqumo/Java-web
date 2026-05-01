@@ -1,4 +1,4 @@
-第3回（復習）：DAOパターンと安全性 — 自習
+第3回（復習）：DAO（参照系）と安全性 — 自習
 <div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
 	
 	<section style="margin-bottom: 30px;">
@@ -11,7 +11,7 @@
 		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #f0f8ff; border: 1px solid #e1dbbd; border-radius: 10px;">
 			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">① DAO/DTO/Entity の3箱</p>
 			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_04_three-boxes_dao-dto-entity.png" alt="DAO/DTO/Entityの3箱" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
-			<p style="margin: 10px 0 0 0; font-size: 14px; color: #555;">本講義のコード例は <strong>ItemDto</strong>（JavaBeans）のみです。図の Entity は概念としての箱として残しています（本編の説明と同じ考え方）。</p>
+			<p style="margin: 10px 0 0 0; font-size: 14px; color: #555;">本講義のコード例は <strong>EmpDto</strong>（JavaBeans）です（社員 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emps</code> / 部署 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">depts</code>）。図の Entity は概念としての箱として残しています。更新系は第4回 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit04_DAO_Update</code>。</p>
 		</div>
 
 		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
@@ -50,7 +50,7 @@
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
 			例外処理は必要ならオプションへ
 		</h2>
-		<p style="margin: 0;">try / catch / try-with-resources は、理解に応じて [オプション講座：例外処理](../Unit90_Exception/01-テキスト-Java例外処理.html) を参照してください。</p>
+		<p style="margin: 0;">try / catch / try-with-resources は、第3回前に <strong>Unit90_Exception</strong>（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">01-テキスト-Java例外処理.html</code>）で押さえる想定です。</p>
 	</section>
 
 </div>

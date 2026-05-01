@@ -1,0 +1,68 @@
+第4回（復習）：DAO（更新系）とトランザクション — 自習
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			復習の位置づけ
+		</h2>
+		<p style="margin: 0 0 12px 0;">このページは<strong>復習・自習専用</strong>です。講義本編は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">01-テキスト-DAO更新とトランザクション.html</code> を参照してください。第3回で扱った <strong>参照系（SELECT）・DAO・PreparedStatement</strong> を前提に、第4回の<strong>更新系とトランザクション</strong>だけを短く立ち返ります。</p>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			復習：図で思い出す（参照と更新の分岐）
+		</h2>
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">executeQuery と executeUpdate</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit02/unit02_statement_execute_branch.png" alt="executeQuery と executeUpdate の分岐（参照系と更新系）" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			<p style="margin: 10px 0 0 0; font-size: 14px; color: #555;">第4回の更新系（INSERT / UPDATE / DELETE）は <strong>executeUpdate</strong> と <strong>更新件数（int）</strong>です。参照の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code>・<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ResultSet</code> とは役割が違います。</p>
+		</div>
+
+		<div style="margin: 0 0 18px 0; padding: 12px 14px; background-color: #f0f8ff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">トランザクションの型（お約束）</p>
+			<ul style="padding-left: 20px; margin: 0; font-size: 14px;">
+				<li style="margin-bottom: 6px;">複数の SQL を<strong>1本の Connection</strong>で順に実行する（メソッドごとに別接続だとトランザクションにまとめられない）。</li>
+				<li style="margin-bottom: 6px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setAutoCommit(false)</code> で自動コミットを止める。</li>
+				<li style="margin-bottom: 6px;">成功なら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">commit()</code>、失敗なら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rollback()</code>。</li>
+				<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">finally</code> で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setAutoCommit(true)</code> に戻す。</li>
+			</ul>
+		</div>
+
+		<div style="margin: 0; padding: 12px 14px; background-color: #fff; border: 1px solid #e1dbbd; border-radius: 10px;">
+			<p style="margin: 0 0 10px 0; font-weight: bold; color: #0033ff;">第3回とのつながり（SQL の安全な渡し方）</p>
+			<img src="https://raw.githubusercontent.com/yamiqumo/Java-web/master/diagrams/00-exported/unit03/unit03_09_preparedstatement_strong-shield.png" alt="PreparedStatementによる無効化" style="max-width: 100%; height: auto; border: 1px solid #e1dbbd; border-radius: 6px; display: block;">
+			<p style="margin: 10px 0 0 0; font-size: 14px; color: #555;">更新系も<strong>文字列連結ではなく</strong> <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">?</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setXxx</code> で値を渡す、という原則は第3回と同じです。</p>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			復習チェック（口頭で確認）
+		</h2>
+		<ul style="padding-left: 20px; margin: 0;">
+			<li style="margin-bottom: 6px;">参照と更新で、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> と戻り値の違いを言える。</li>
+			<li style="margin-bottom: 6px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">commit</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rollback</code> を、いつ呼ぶか一言で説明できる。</li>
+			<li style="margin-bottom: 6px;">なぜ「複数 SQL を同じ Connection で」まとめる必要があるか、トランザクションの観点で言える。</li>
+			<li style="margin-bottom: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> の各メソッドが内部で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection()</code> している場合、発展の「1トランザクション複数操作」ではどう工夫するか、本編の言葉で思い出せる。</li>
+		</ul>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			手を動かす・参照する
+		</h2>
+		<ul style="padding-left: 20px; margin: 0;">
+			<li style="margin-bottom: 6px;"><strong>練習問題</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">03-練習問題-DAO更新とトランザクション.html</code></li>
+			<li style="margin-bottom: 6px;"><strong>トランザクション実行例（Java）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit04_DAO_Update/src/TransactionSample.java</code></li>
+			<li style="margin-bottom: 0;"><strong>共通クラス</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit03_DAO/src</code> の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDto</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code></li>
+		</ul>
+	</section>
+
+	<section style="margin-bottom: 10px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			例外処理の復習（必要なら）
+		</h2>
+		<p style="margin: 0;">try / catch / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SQLException</code> の流れは <strong>Unit90_Exception</strong> のテキストで押さえたうえで、本編の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rollback</code> が追いやすくなります。</p>
+	</section>
+
+</div>

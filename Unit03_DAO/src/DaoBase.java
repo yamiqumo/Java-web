@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class DaoBase {
 
 	// TODO: 自分の環境に合わせて修正（Unit02 の JDBC サンプルと同じ前提）
-	private static final String URL = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&serverTimezone=Asia/Tokyo";
+	private static final String URL = "jdbc:mysql://localhost:3306/lesson?useSSL=false&serverTimezone=Asia/Tokyo";
 	private static final String USER = "root";
 	private static final String PASS = "password";
 

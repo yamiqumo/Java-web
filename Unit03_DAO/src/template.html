@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<title>第3回：DAOパターンと安全性〜「直書きJDBC」からの脱却〜</title>
+<title>第3回：DAO（参照系）と安全性〜「直書きJDBC」からの脱却〜</title>
 <link rel="stylesheet" href="../../assets/pdf-a4.css">
 
 </head>
@@ -15,8 +15,9 @@
 		</h2>
 		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
 			<div style="margin: 15px 0; background-color: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 10px 0;">この回は、Java から DB に命令する作業を **DAO（DB担当窓口）** に集約し、上流側（呼び出し側）と切り離すための回です。</p>
-				<p style="margin: 0;">扱う題材の基本は <strong>items</strong>（ECサイトの商品）で、必要になったときだけ発展として関連テーブルを扱います。</p>
+				<p style="margin: 0 0 10px 0;">この回は、Java から DB に命令する作業を <strong>DAO（DB担当窓口）</strong> に集約し、上流側（呼び出し側）と切り離すための回です。<strong>第3回は参照系（SELECT）のみ</strong>扱います。</p>
+				<p style="margin: 0 0 8px 0;">題材は <strong>emps</strong>（社員）と <strong>depts</strong>（部署）です（環境構築 HTML の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lesson</code> DB）。単表の検索から、2テーブル結合（JOIN）まで段階的に進めます。</p>
+				<p style="margin: 0; font-size: 13px; color: #555;"><strong>INSERT / UPDATE / DELETE とトランザクション</strong>は <strong>第4回</strong>（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit04_DAO_Update</code>）で扱います。</p>
 			</div>
 		</div>
 
@@ -45,7 +46,7 @@
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			3. DAO / DTO / Entity の3箱（写経）
+			3. DAO / DTO / Entity の3箱（確認）
 		</h2>
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -53,11 +54,11 @@
 		</div>
 
 		<div style="margin: 15px 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-			<p style="margin: 0;">上の図は、上流から見たときの<strong>役割の分け方（DAO / DTO / Entity の3箱）</strong>を示す概念図です。<strong>この回の写経・サンプルコードでは、Entity と DTO を同一視し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto</code>（JavaBeans）1 クラスだけ</strong>で進めます。</p>
+			<p style="margin: 0;">上の図は、上流から見たときの<strong>役割の分け方（DAO / DTO / Entity の3箱）</strong>を示す概念図です。<strong>この回のサンプルコードでは、Entity と DTO を同一視し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDto</code>（JavaBeans）1 クラスだけ</strong>で進めます（部署名が要るときは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">deptName</code> フィールドにだけ JOIN 結果を載せます）。</p>
 		</div>
 
 		<details open style="margin-top: 10px;">
-			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">写経（Service → DAO → DB）</summary>
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">確認（Service → DAO → DB）</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">Service → DAO → DB
 DTO = 運ぶ箱（画面/呼び出し向け）
@@ -68,16 +69,16 @@ Entity = DBの行（テーブル向け）</pre>
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			4. 写経とは？（体で覚える）
+			4. 学び方のコツ（最初は型を真似する）
 		</h2>
 		<div style="margin: 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-			<p style="margin: 0;">プログラミング学習における<strong>写経</strong>は、<strong>ソースコードを見たまま打つことで、頭でなく体で覚える学習方法</strong>という理解でお願いします。下のサンプルは Eclipse などにそのまま写して動かす前提です。</p>
+			<p style="margin: 0;">最初は、<strong>動くコードの型</strong>をそのまま真似して動かし、「どこを変えると何が変わるか」を確認しながら理解を深めてください。下のサンプルは Eclipse などに貼り付けて動かす前提です。</p>
 		</div>
 	</section>
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			5. DAOクラスの基本型（DaoBase・ItemDto・ItemDao）
+			5. DAOクラスの基本型（DaoBase・EmpDto・EmpDao）
 		</h2>
 		<div style="margin: 0 0 15px 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<p style="margin: 0 0 8px 0;"><strong>（参考）Entity と DTO をクラスとして分ける場合</strong></p>
@@ -85,14 +86,14 @@ Entity = DBの行（テーブル向け）</pre>
 				<li style="margin-bottom: 6px;"><strong>メリット</strong>：例として、パスワードのハッシュなど、画面や公開 API に載せたくない列は、DB に近い側（いわゆる Entity 側）にだけ保持し、外に運ぶ DTO には含めない、といった切り分けがしやすい。</li>
 				<li style="margin-bottom: 0;"><strong>デメリット</strong>：クラスやマッピング（詰め替え）が増え、名前の使い分けも悩みやすくなる。</li>
 			</ul>
-			<p style="margin: 0; font-size: 13px; color: #555;">大規模なアプリではこのように分けることがありますが、<strong>本講義規模の JDBC では次の ItemDto（JavaBeans）だけで十分</strong>です。</p>
+			<p style="margin: 0; font-size: 13px; color: #555;">大規模なアプリではこのように分けることがありますが、<strong>本講義規模の JDBC では次の EmpDto（JavaBeans）だけで十分</strong>です。</p>
 		</div>
 		<div style="margin: 0 0 15px 0; padding: 15px; background-color: #f0f8ff; border-radius: 10px; border: 1px solid #e1dbbd;">
 			<ul style="padding-left: 20px; margin: 0;">
 				<li style="margin-bottom: 6px;"><strong>接続情報</strong>は設計にもよるが、ここでは親クラス <strong>DaoBase</strong> に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection()</code> を用意して集約する。</li>
-				<li style="margin-bottom: 6px;"><strong>テーブルごとに1クラス</strong>：例として <strong>items</strong> 用に <strong>ItemDao</strong> を用意する。</li>
-				<li style="margin-bottom: 6px;"><strong>CRUD</strong>：1件検索・全件検索・1件挿入・1件更新・1件削除を ItemDao に用意する（参照は <strong>ItemDto</strong> を返す、更新は件数を返す）。</li>
-				<li style="margin-bottom: 0;">残りのメソッド（findAll / update / delete など）の穴埋めは、練習問題で完成させる。</li>
+				<li style="margin-bottom: 6px;"><strong>テーブルごとに1クラス</strong>：例として <strong>emps</strong> 用に <strong>EmpDao</strong> を用意する（部署マスタは必要に応じて別 DAO に分けてもよい）。</li>
+				<li style="margin-bottom: 6px;"><strong>第3回（参照系）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findById</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findAll</code> など、<strong>SELECT</strong> で <strong>EmpDto</strong>（またはリスト）を返す。</li>
+				<li style="margin-bottom: 0;"><strong>第4回（更新系）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">insert</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">update</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">delete</code> とトランザクションは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit04_DAO_Update</code> で学ぶ。サンプルの <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao.java</code> には第4回用メソッドも載せてあるが、本回の講義では読まなくてよい。</li>
 			</ul>
 		</div>
 
@@ -111,7 +112,7 @@ import java.sql.SQLException;
 public class DaoBase {
 
 	// TODO: 自分の環境に合わせて修正
-	private static final String URL = "jdbc:mysql://localhost:3306/sample_db?useSSL=false&amp;serverTimezone=Asia/Tokyo";
+	private static final String URL = "jdbc:mysql://localhost:3306/lesson?useSSL=false&amp;serverTimezone=Asia/Tokyo";
 	private static final String USER = "root";
 	private static final String PASS = "password";
 
@@ -127,125 +128,104 @@ public class DaoBase {
 		</details>
 
 		<details open style="margin-top: 10px;">
-			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">ItemDto（JavaBeans・ドラッグでコピー・クリックで開く）</summary>
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">EmpDto（JavaBeans・ドラッグでコピー・クリックで開く）</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0; font-size: 13px; color: #555;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">fname</code>＝苗字、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lname</code>＝名前（環境構築 SQL のコメントに合わせる）。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">deptName</code> は単表 SELECT では <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code>、JOIN するときだけセットする。</p>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 480px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">/**
- * items テーブルの1行を表す DTO（本講義では Entity と同一視）。
+					<textarea readonly style="width: 100%; height: 520px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">/**
+ * emps テーブルの1行を表す DTO（本講義では Entity と同一視）。
+ * deptName は JOIN 時のみ使用（単表なら null）。
  */
-public class ItemDto {
+public class EmpDto {
 
-	private int itemId;
-	private String category;
-	private String itemName;
-	private int unitPrice;
+	private int empId;
+	private String fname;
+	private String lname;
+	private int salary;
+	private int deptNo;
+	private String deptName;
 
-	public ItemDto() {
+	public EmpDto() {
 	}
 
-	public ItemDto(int itemId, String category, String itemName, int unitPrice) {
-		this.itemId = itemId;
-		this.category = category;
-		this.itemName = itemName;
-		this.unitPrice = unitPrice;
+	public EmpDto(int empId, String fname, String lname, int salary, int deptNo, String deptName) {
+		this.empId = empId;
+		this.fname = fname;
+		this.lname = lname;
+		this.salary = salary;
+		this.deptNo = deptNo;
+		this.deptName = deptName;
 	}
 
-	public int getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(int itemId) {
-		this.itemId = itemId;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public String getItemName() {
-		return itemName;
-	}
-
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
-
-	public int getUnitPrice() {
-		return unitPrice;
-	}
-
-	public void setUnitPrice(int unitPrice) {
-		this.unitPrice = unitPrice;
-	}
+	public int getEmpId() { return empId; }
+	public void setEmpId(int empId) { this.empId = empId; }
+	public String getFname() { return fname; }
+	public void setFname(String fname) { this.fname = fname; }
+	public String getLname() { return lname; }
+	public void setLname(String lname) { this.lname = lname; }
+	public int getSalary() { return salary; }
+	public void setSalary(int salary) { this.salary = salary; }
+	public int getDeptNo() { return deptNo; }
+	public void setDeptNo(int deptNo) { this.deptNo = deptNo; }
+	public String getDeptName() { return deptName; }
+	public void setDeptName(String deptName) { this.deptName = deptName; }
 }</textarea>
 				</div>
 			</div>
 		</details>
 
 		<details open style="margin-top: 10px;">
-			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">ItemDao：代表メソッド（findById と insert の完成例）</summary>
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">EmpDao：代表メソッド（findById の完成例・第3回）</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<p style="margin: 0 0 10px 0;">メソッドは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">throws SQLException</code> とし、例外の詳細は正課外の例外処理オプションを参照してください。</p>
+				<p style="margin: 0 0 10px 0;">この教材では、DAO メソッドに <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">throws SQLException</code> を付けず、DAO 内で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">catch (SQLException e)</code> して <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">e.printStackTrace()</code> する形を基本にします（本来はログ設計・通知・リカバリーを検討します）。例外の考え方は <strong>第3回前に</strong> <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit90_Exception</code> で押さえておくと読みやすくなります。</p>
 				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
 					<p style="font-size: 12px; color: #0050b3; margin-bottom: 8px; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください：</p>
-					<textarea readonly style="width: 100%; height: 420px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
+					<textarea readonly style="width: 100%; height: 360px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ItemDao extends DaoBase {
+public class EmpDao extends DaoBase {
 
 	/**
-	 * 1件検索：主キー item_id で1行を取得する。
+	 * 1件検索：主キー emp_id で1行を取得する（部署名は入れない）。
 	 */
-	public ItemDto findById(int itemId) throws SQLException {
-		String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
+	public EmpDto findById(int empId) {
+		String sql = "SELECT emp_id, fname, lname, salary, dept_no FROM emps WHERE emp_id = ?";
 
 		try (Connection con = getConnection();
 				PreparedStatement ps = con.prepareStatement(sql)) {
 
-			ps.setInt(1, itemId);
+			ps.setInt(1, empId);
 
 			try (ResultSet rs = ps.executeQuery()) {
 				if (rs.next()) {
-					return new ItemDto(
-							rs.getInt("item_id"),
-							rs.getString("category"),
-							rs.getString("item_name"),
-							rs.getInt("unit_price"));
+					return new EmpDto(
+							rs.getInt("emp_id"),
+							rs.getString("fname"),
+							rs.getString("lname"),
+							rs.getInt("salary"),
+							rs.getInt("dept_no"),
+							null);
 				}
 				return null;
 			}
-		}
-	}
-
-	/**
-	 * 1件挿入：新しい商品行を追加する。
-	 */
-	public int insert(ItemDto item) throws SQLException {
-		String sql = "INSERT INTO items (item_id, category, item_name, unit_price) VALUES (?, ?, ?, ?)";
-
-		try (Connection con = getConnection();
-				PreparedStatement ps = con.prepareStatement(sql)) {
-
-			ps.setInt(1, item.getItemId());
-			ps.setString(2, item.getCategory());
-			ps.setString(3, item.getItemName());
-			ps.setInt(4, item.getUnitPrice());
-
-			return ps.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 }</textarea>
 				</div>
 			</div>
 		</details>
-		<p style="margin: 0; font-size: 13px; color: #555;">完全版のソースは <strong>Unit03_DAO/src</strong> フォルダ（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao.java</code>）にも同じ内容を置いています。</p>
+
+		<div style="margin: 20px 0 10px 0; padding: 15px; background-color: #fff8e6; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0; font-size: 14px;"><strong>流れの確認と記述の型</strong>は、<strong>「6. データの旅」</strong>の直後の<strong>見出し 7（理解を深める問題）</strong>で、<strong>商品テーブル items</strong> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao</code> を題材にまとめて行います（この節のコード例は emps のままです）。<strong>SQL の細かい穴埋めや JOIN（emps / depts）</strong>は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">03-練習問題-DAO参照系（emps-depts）.html</code> で扱います。</p>
+		</div>
+
+		<p style="margin: 12px 0 0 0; font-size: 13px; color: #555;">完全版のソースは <strong>Unit03_DAO/src</strong>（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDto.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao.java</code>）。参考として <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto.java</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao.java</code>（items 用）も同フォルダに残しています。</p>
 	</section>
 
 	<section style="margin-bottom: 30px;">
@@ -267,7 +247,300 @@ public class ItemDao extends DaoBase {
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			7. PreparedStatement：? と setXxx の対応
+			7. 理解を深める問題（1本）〜items / ItemDao の findById
+		</h2>
+		<div style="margin: 0 0 15px 0; padding: 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+			<p style="margin: 0;">テーマは <strong>商品テーブル items</strong> と <strong>ItemDao の findById（1件検索）</strong>に固定します。まず<strong>流れの並べ替え</strong>で更新系との違いを意識し、つづけて<strong>記述</strong>で型・コメント・パート別の穴埋めを身につけます。記述で詰まったら<strong>ヒント①→②→③</strong>の順に開いてください。</p>
+		</div>
+
+		<h3 style="color: #0033ff; font-size: 16px; padding-left: 10px; margin-top: 20px; margin-bottom: 10px;">【流れの把握】並べ替え（紛らわしい文つき）</h3>
+		<p style="margin: 0 0 10px 0;"><strong>問題1</strong>　次の <strong>ア〜コ</strong> のうち、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao#findById</code>（<strong>参照系・1件取得</strong>）として<strong>実際に行う処理だけ</strong>を取り出し、<strong>実行される順番</strong>に並べてください（例：ウ→ア→… のように記号の列をノートに書く）。<strong>使わない文が4つ</strong>残ります。さらに、残った4つを「更新系APIの誤用」「順序が不可能」「トランザクションの混同」のどれかに分類し、理由を一言で書いてください。</p>
+		<ul style="margin: 0 0 12px 0; padding-left: 22px; list-style: none;">
+			<li style="margin-bottom: 8px;"><strong>ア</strong>　SQL 文字列を用意する（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?</code>）</li>
+			<li style="margin-bottom: 8px;"><strong>イ</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection()</code> でデータベースへの接続を取得する</li>
+			<li style="margin-bottom: 8px;"><strong>ウ</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">prepareStatement(sql)</code> で SQL をドライバに渡し、実行準備（プリコンパイル）をする</li>
+			<li style="margin-bottom: 8px;"><strong>エ</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setInt(1, itemId)</code> でプレースホルダに検索キーを格納する</li>
+			<li style="margin-bottom: 8px;"><strong>オ</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery()</code> で検索を実行し、得られた ResultSet を開く</li>
+			<li style="margin-bottom: 8px;"><strong>カ</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rs.next()</code> でカーソルを進め、行があれば <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getXxx</code> で列を読み <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto</code> を組み立てて返す（なければ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code>）</li>
+			<li style="margin-bottom: 8px;"><strong>キ</strong>　検索を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate()</code> で実行し、その戻り値を ResultSet に格納する</li>
+			<li style="margin-bottom: 8px;"><strong>ク</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">INSERT</code> 文を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> し、続けて同じ ResultSet で SELECT 結果を読む</li>
+			<li style="margin-bottom: 8px;"><strong>ケ</strong>　接続を取得する<strong>前に</strong>、ResultSet のカーソルで <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code> を読み取る</li>
+			<li style="margin-bottom: 0;"><strong>コ</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">commit()</code> でトランザクションを確定してから、SQL 文字列を用意する</li>
+		</ul>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0; font-size: 13px; color: #555;">正しい順の記号列と、使わなかった記号とその理由をメモできます。</p>
+				<textarea style="width: 100%; min-height: 100px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="ここに並べた記号列を書く"></textarea>
+			</div>
+		</details>
+
+		<p style="margin: 16px 0 8px 0;"><strong>問題2（確認）</strong>　呼び出し側に「items の1行分のデータ」を運ぶための箱として、まず連想するクラスはどれですか。</p>
+		<ul style="margin: 0 0 15px 0; padding-left: 22px;">
+			<li style="margin-bottom: 4px;"><strong>A</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase</code></li>
+			<li style="margin-bottom: 4px;"><strong>B</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao</code></li>
+			<li style="margin-bottom: 0;"><strong>C</strong>　<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDto</code></li>
+		</ul>
+
+		<h3 style="color: #0033ff; font-size: 16px; padding-left: 10px; margin-top: 20px; margin-bottom: 10px;">【記述①】クラス名・型の穴埋め</h3>
+		<p style="margin: 0 0 8px 0; font-size: 14px;"><code style="font-family: monospace;">____</code> を埋めてください。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">public class ____ extends ____ {
+
+	public ____ findById(int itemId) {
+		// 以降は記述②・③へ
+	}
+}</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 90px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="穴埋め後のクラス宣言を書く"></textarea>
+			</div>
+		</details>
+
+		<h3 style="color: #0033ff; font-size: 16px; padding-left: 10px; margin-top: 20px; margin-bottom: 10px;">【記述②】コメントを簡潔で正確な日本語に書き換える</h3>
+		<p style="margin: 0 0 8px 0; font-size: 14px;">次の <code style="font-family: monospace;">// （…）</code> を、処理内容が伝わる<strong>講義向けの短い日本語</strong>に置き換えてください。解答例には<strong>模範コメントの一覧</strong>と<strong>コメント付き全文</strong>の両方があります。</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">public ItemDto findById(int itemId) {
+	String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
+
+	// （ここ①：この try がまとめて行っていること）
+	try (Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(sql)) {
+
+		// （ここ②：SQL の「?」と対応づける操作）
+		ps.setInt(1, itemId);
+
+		// （ここ③：内側の try が担うこと）
+		try (ResultSet rs = ps.executeQuery()) {
+			// （ここ④：ResultSet のカーソルと1行分のデータ）
+			if (rs.next()) {
+				return new ItemDto(
+						rs.getInt("item_id"),
+						rs.getString("category"),
+						rs.getString("item_name"),
+						rs.getInt("unit_price"));
+			}
+			// （ここ⑤：該当行が無いとき）
+			return null;
+		}
+	}
+}</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 220px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="コメントを書き換えたメソッド全体を貼る"></textarea>
+			</div>
+		</details>
+
+		<h3 style="color: #0033ff; font-size: 16px; padding-left: 10px; margin-top: 20px; margin-bottom: 10px;">【記述③】パート別の穴埋め → 全体をつなげて実行できる形に</h3>
+		<p style="margin: 0 0 10px 0; font-size: 14px;">①〜⑤はそれぞれ <code style="font-family: monospace;">____</code> を埋めたうえで、<strong>最後に1つのメソッド</strong>として連結できるか確認します（import とクラス宣言は解答例を参照）。</p>
+
+		<p style="margin: 0 0 6px 0; font-weight: bold; font-size: 14px;">① データベースへの接続</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">try (Connection con = ______();
+</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 70px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="① 埋めた行を書く"></textarea>
+			</div>
+		</details>
+
+		<p style="margin: 12px 0 6px 0; font-weight: bold; font-size: 14px;">② SQL を準備（プリコンパイル）</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">		PreparedStatement ps = con.______(______)) {
+</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 70px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="② 埋めた行を書く"></textarea>
+			</div>
+		</details>
+
+		<p style="margin: 12px 0 6px 0; font-weight: bold; font-size: 14px;">③ プレースホルダに値を格納</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">		ps.______(______, itemId);
+</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 70px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="③ 埋めた行を書く"></textarea>
+			</div>
+		</details>
+
+		<p style="margin: 12px 0 6px 0; font-weight: bold; font-size: 14px;">④ SQL を実行して DB から結果セットを得る</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">		try (ResultSet rs = ps.______()) {
+</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 70px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="④ 埋めた行を書く"></textarea>
+			</div>
+		</details>
+
+		<p style="margin: 12px 0 6px 0; font-weight: bold; font-size: 14px;">⑤ ResultSet のカーソルでデータを取り出す</p>
+		<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 8px 0;">			if (rs.______()) {
+				return new ItemDto(
+						rs.getInt("______"),
+						rs.getString("______"),
+						rs.getString("______"),
+						rs.getInt("______"));
+			}
+			return null;
+		}
+	}</pre>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 120px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="⑤ 埋めたブロックを書く"></textarea>
+			</div>
+		</details>
+
+		<p style="margin: 14px 0 8px 0; font-weight: bold; font-size: 14px;">全体：①〜⑤をつなぎ、findById メソッドとして完成させる</p>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">自分の答え・貼り付け用（メソッド全体・クリックで開く）</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<textarea style="width: 100%; min-height: 280px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; box-sizing: border-box;" placeholder="findById の完成コード（import は別／クラス内メソッドのみでも可）"></textarea>
+			</div>
+		</details>
+
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント①</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0; font-size: 14px;">並べ替えでは「<strong>参照は executeQuery</strong>」「<strong>更新件数は executeUpdate</strong>」を切り分けます。接続より先に ResultSet はあり得ません。</p>
+				<p style="margin: 0; font-size: 14px;">記述①は「誰が誰を継承し、何を返すメソッドか」。記述③の①〜⑤は、接続→文の準備→プレースホルダ→実行→カーソル、の五段に対応します。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント②</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0; font-size: 14px;">外側の try-with-resources は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection()</code> と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">prepareStatement(sql)</code> をまとめて閉じます。</p>
+				<p style="margin: 0 0 8px 0; font-size: 14px;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setInt(1, itemId)</code> の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">1</code> は SQL 内のプレースホルダの<strong>先頭</strong>です。</p>
+				<p style="margin: 0; font-size: 14px;">⑤の列名は SELECT 句と一致させます（スネークケースのまま文字列で指定）。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント③</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0 0 8px 0; font-size: 14px;">記述①：<strong>ItemDao</strong>、<strong>DaoBase</strong>、戻り値型 <strong>ItemDto</strong>。</p>
+				<p style="margin: 0 0 8px 0; font-size: 14px;">問題1 の正しい順：<strong>ア → イ → ウ → エ → オ → カ</strong>。使わないのは <strong>キ・ク・ケ・コ</strong>（解答例に理由あり）。</p>
+				<p style="margin: 0 0 8px 0; font-size: 14px;">記述③：① <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">getConnection</code>　② <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">prepareStatement</code>, <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">sql</code>　③ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setInt</code>, <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">1</code>　④ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeQuery</code>　⑤ <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">next</code> と列名 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_id</code>, <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">category</code>, <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">item_name</code>, <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">unit_price</code>。</p>
+				<p style="margin: 0; font-size: 14px;">記述②の模範コメントは「解答例」内の箇条書きとコードを参照。</p>
+			</div>
+		</details>
+		<details open style="margin-top: 10px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
+				<p style="font-size: 12px; color: #666; margin-bottom: 5px;">【解説・確認用】</p>
+				<p style="margin: 0 0 10px 0; font-size: 14px;"><strong>問題1</strong>　正しい実行順は <strong>ア → イ → ウ → エ → オ → カ</strong>。<strong>キ</strong>は参照に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">executeUpdate</code> は使わず、戻り値も ResultSet ではありません。<strong>ク</strong>は INSERT と SELECT が混ざった誤ったイメージです。<strong>ケ</strong>は接続前に ResultSet を読めません。<strong>コ</strong>は単純な1件取得では不要な順序で紛らわしいです。</p>
+				<p style="margin: 0 0 15px 0; font-size: 14px;"><strong>問題2</strong>　正解は <strong>C（ItemDto）</strong>。<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">ItemDao</code> は窓口、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">DaoBase</code> は接続の共通部です。</p>
+				<p style="margin: 0 0 8px 0; font-size: 14px;"><strong>記述②の模範コメント（ここ①〜⑤）</strong></p>
+				<ul style="margin: 0 0 12px 0; padding-left: 22px; font-size: 14px;">
+					<li style="margin-bottom: 6px;"><strong>①</strong>　接続を取得し、実行する SQL 文をバインドする（try-with-resources）</li>
+					<li style="margin-bottom: 6px;"><strong>②</strong>　先頭のプレースホルダに itemId をセットする</li>
+					<li style="margin-bottom: 6px;"><strong>③</strong>　検索を実行し、結果セット（カーソル）を開く</li>
+					<li style="margin-bottom: 6px;"><strong>④</strong>　カーソルを1行進め、行があれば列から値を読み取り ItemDto を組み立てて返す</li>
+					<li style="margin-bottom: 0;"><strong>⑤</strong>　該当行がなければ null を返す</li>
+				</ul>
+				<p style="margin: 0 0 8px 0; font-size: 14px;"><strong>記述①・②・③（コメント付きメソッド全文）</strong></p>
+				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0 0 15px 0;">public ItemDto findById(int itemId) {
+	String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
+
+	// 接続を取得し、実行する SQL 文をバインドする（try-with-resources）
+	try (Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(sql)) {
+
+		// 先頭のプレースホルダに itemId をセットする
+		ps.setInt(1, itemId);
+
+		// 検索を実行し、結果セット（カーソル）を開く
+		try (ResultSet rs = ps.executeQuery()) {
+			// カーソルを1行進め、行があれば列から値を読み取り ItemDto を組み立てて返す
+			if (rs.next()) {
+				return new ItemDto(
+						rs.getInt("item_id"),
+						rs.getString("category"),
+						rs.getString("item_name"),
+						rs.getInt("unit_price"));
+			}
+			// 該当行がなければ null
+			return null;
+		}
+	}
+}</pre>
+				<p style="margin: 0 0 8px 0; font-size: 12px; color: #0050b3; font-weight: bold;">マウスで全選択して貼り付け欄へドラッグしてください（参考・メソッドのみ）：</p>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<textarea readonly style="width: 100%; height: 320px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">public ItemDto findById(int itemId) {
+	String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
+
+	// 接続を取得し、実行する SQL 文をバインドする（try-with-resources）
+	try (Connection con = getConnection();
+			PreparedStatement ps = con.prepareStatement(sql)) {
+
+		// 先頭のプレースホルダに itemId をセットする
+		ps.setInt(1, itemId);
+
+		// 検索を実行し、結果セット（カーソル）を開く
+		try (ResultSet rs = ps.executeQuery()) {
+			// カーソルを1行進め、行があれば列から値を読み取り ItemDto を組み立てて返す
+			if (rs.next()) {
+				return new ItemDto(
+						rs.getInt("item_id"),
+						rs.getString("category"),
+						rs.getString("item_name"),
+						rs.getInt("unit_price"));
+			}
+			// 該当行がなければ null
+			return null;
+		}
+	}
+}</textarea>
+				</div>
+				<p style="margin: 16px 0 8px 0; font-size: 12px; color: #0050b3; font-weight: bold;">ItemDao クラス・import 付き（Unit03_DAO/src/ItemDao.java の findById 部と一致・ドラッグ用）：</p>
+				<div style="background: #e6f7ff; padding: 10px 15px; border: 2px dashed #1890ff; border-radius: 6px;">
+					<textarea readonly style="width: 100%; height: 380px; font-family: Consolas, monospace; font-size: 13px; padding: 10px; border: 1px solid #91d5ff; background: #fff; display: block; user-select: all !important;">import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class ItemDao extends DaoBase {
+
+	/**
+	 * 1件検索：主キー item_id で1行を取得する。
+	 *
+	 * @param itemId 商品ID
+	 * @return 該当行があれば ItemDto、なければ null
+	 */
+	public ItemDto findById(int itemId) {
+		String sql = "SELECT item_id, category, item_name, unit_price FROM items WHERE item_id = ?";
+
+		try (Connection con = getConnection();
+				PreparedStatement ps = con.prepareStatement(sql)) {
+
+			ps.setInt(1, itemId);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return new ItemDto(
+							rs.getInt("item_id"),
+							rs.getString("category"),
+							rs.getString("item_name"),
+							rs.getInt("unit_price"));
+				}
+				return null;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+}</textarea>
+				</div>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			8. PreparedStatement：? と setXxx の対応
 		</h2>
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -281,13 +554,13 @@ public class ItemDao extends DaoBase {
 		</div>
 
 		<details open style="margin-top: 10px;">
-			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">最小コードイメージ（items検索）</summary>
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">最小コードイメージ（emps 検索）</summary>
 			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
-				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">String sql = "SELECT item_name, unit_price FROM items WHERE category = ?";
+				<pre style="background-color: #fdf5e6; color: #333; padding: 12px 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">String sql = "SELECT fname, lname, salary FROM emps WHERE dept_no = ?";
 
 try (Connection con = DriverManager.getConnection(URL, USER, PASS);
      PreparedStatement ps = con.prepareStatement(sql)) {
-	ps.setString(1, category); // 先頭の「?」に値を入れる
+	ps.setInt(1, deptNo); // 先頭の「?」に値を入れる
 
 	try (ResultSet rs = ps.executeQuery()) {
 		while (rs.next()) {
@@ -301,7 +574,7 @@ try (Connection con = DriverManager.getConnection(URL, USER, PASS);
 
 	<section style="margin-bottom: 30px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			8. 最小のミッション（DAOへ切り出す）
+			9. 最小のミッション（DAOへ切り出す）
 		</h2>
 
 		<div style="margin: 15px 0; padding: 10px 10px; background-color: #fff; border-radius: 10px; border: 1px solid #e1dbbd;">
@@ -318,9 +591,10 @@ try (Connection con = DriverManager.getConnection(URL, USER, PASS);
 
 	<section style="margin-bottom: 10px;">
 		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
-			9. 例外処理はオプション（必要なら）
+			10. 例外処理（第3回前に押さえる）
 		</h2>
-		<p style="margin: 0;">この回は <strong>例外処理の詳細を必須にしない</strong> ため、深掘りは正課外の [オプション講座：例外処理] を使ってください。</p>
+		<p style="margin: 0 0 8px 0;"><strong>カリキュラム上は第3回の直前に</strong>、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit90_Exception</code>（および <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">curriculum/units/optional-exception-handling.md</code>）で try / catch / try-with-resources を扱う想定です。</p>
+		<p style="margin: 0;">この教材では、DAO 内で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">SQLException</code> を捕捉し、まずは <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">e.printStackTrace()</code> で原因の見える化をします（本来はログ設計・通知・リカバリーを検討します）。第4回の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rollback</code> も、この例外の流れを押さえると読みやすくなります。</p>
 	</section>
 </div>
 

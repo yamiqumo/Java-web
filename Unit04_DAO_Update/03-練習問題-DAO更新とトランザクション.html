@@ -1,0 +1,109 @@
+DAO 練習問題（更新系・トランザクション）〜INSERT / UPDATE / DELETE〜
+<div style="max-width: 800px; margin: 0 auto; font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif; line-height: 1.6; color: #333; padding: 20px; border: 1px solid #eee; background-color: #fff;">
+
+	<h1 style="padding-left: 10px; background-color: #f0f8ff; color: #0033ff; font-size: 24px; margin-bottom: 30px;">
+		DAO 練習問題（更新系・トランザクション）〜INSERT / UPDATE / DELETE〜
+	</h1>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			進め方（3ステップ）
+		</h2>
+		<div style="background-color: #f0f8ff; padding: 20px; border-radius: 5px; border-left: 5px solid #0033ff;">
+			<ol style="padding-left: 20px; margin: 0;">
+				<li style="margin-bottom: 8px;"><strong>Step 1</strong>：講義テキスト（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">01-テキスト-DAO更新とトランザクション.html</code>）の穴埋めと <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> の更新系メソッドの流れを確認する。</li>
+				<li style="margin-bottom: 8px;"><strong>Step 2（基本）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">insert</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">delete</code> / <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">updateSalaryAndDept</code> を <strong>別々の実行</strong>で試す（各呼び出しが独自に接続を取る）。</li>
+				<li style="margin-bottom: 0;"><strong>Step 3（発展）</strong>：<strong>同一 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Connection</code></strong> で、指定順の6操作を <strong>1トランザクション</strong>にまとめる。失敗時は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rollback</code> すること。</li>
+			</ol>
+		</div>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			注意（emp_id の取り合い）
+		</h2>
+		<p style="margin: 0;">演習で新規に挿入する <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id</code> は、<strong>既存の 1〜10 や他の受講者と被らない番号</strong>を使うこと（例: 自分の出席番号、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">11</code>〜<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">99</code> の空き）。基本問題の解答例では <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">88</code> を仮に使う。終了前に <strong>テスト行を削除</strong>してよい状態に戻すこと。</p>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			基本問題（INSERT / DELETE / UPDATE）
+		</h2>
+
+		<p style="margin-bottom: 5px; margin-top: 20px;"><strong>問題1（INSERT）</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao#insert</code> で、新しい社員（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id</code> は自分で決める。苗字・名前・給与・<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dept_no</code> は任意）を1件追加し、Workbench または <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findById</code> で確認せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">new EmpDto(88, "演習", "太郎", 200000, 10, null)</code> のように第6引数は <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code> でよい。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">EmpDao dao = new EmpDao();
+EmpDto e = new EmpDto(88, "演習", "太郎", 200000, 10, null);
+int n = dao.insert(e);
+System.out.println("insert件数=" + n);
+System.out.println(dao.findById(88));</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題2（DELETE）</strong>：問題1で入れた <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id</code> の行を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao#delete</code> で削除し、削除件数と <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">findById</code> が <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code> になることを確認せよ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">EmpDao dao = new EmpDao();
+System.out.println("delete件数=" + dao.delete(88));
+System.out.println(dao.findById(88));</pre>
+			</div>
+		</details>
+
+		<p style="margin-bottom: 5px; margin-top: 25px;"><strong>問題3（UPDATE）</strong>：既存の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id = 3</code> の給与を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">290000</code>、部署を <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">dept_no = 30</code> に変更したあと、元の値（給与 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">280000</code>、部署 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">20</code>）に戻せ。</p>
+		<div style="border-bottom: 1px solid #ccc; margin: 10px 0;"></div>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">updateSalaryAndDept</code> は主キー <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id</code> を DTO に含める。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答例</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<pre style="background-color: #fdf5e6; color: #333; padding: 15px; border-radius: 5px; border: 1px solid #e1dbbd; overflow-x: auto; font-family: monospace; margin: 0;">EmpDao dao = new EmpDao();
+dao.updateSalaryAndDept(new EmpDto(3, null, null, 290000, 30, null));
+System.out.println(dao.findById(3).getSalary() + " " + dao.findById(3).getDeptNo());
+dao.updateSalaryAndDept(new EmpDto(3, null, null, 280000, 20, null));</pre>
+				<p style="margin: 10px 0 0 0; font-size: 13px; color: #555;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">fname</code>/<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">lname</code> は UPDATE 文に含まれないため <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">null</code> のままでよい。</p>
+			</div>
+		</details>
+	</section>
+
+	<section style="margin-bottom: 30px;">
+		<h2 style="border-left: 5px solid #0033ff; padding-left: 10px; color: #0033ff; font-size: 18px; margin-bottom: 15px;">
+			発展問題（1トランザクション・6操作）
+		</h2>
+		<p style="margin-bottom: 10px;"><strong>仕様</strong>：<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setAutoCommit(false)</code> した <strong>同一 <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Connection</code></strong> 上で、次をこの順に実行し、最後に <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">commit</code> する。途中で例外が出たら <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">rollback</code> し、<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">finally</code> で <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">setAutoCommit(true)</code> に戻す。</p>
+		<ol style="padding-left: 20px; margin: 0 0 15px 0;">
+			<li style="margin-bottom: 6px;">INSERT（テスト用の社員。主キーは他と被らない値）</li>
+			<li style="margin-bottom: 6px;">SELECT（挿入した行が取れることを確認・表示）</li>
+			<li style="margin-bottom: 6px;">UPDATE（給与など1列でもよい）</li>
+			<li style="margin-bottom: 6px;">SELECT（更新後の値が見えることを確認）</li>
+			<li style="margin-bottom: 6px;">DELETE（テスト行を削除）</li>
+			<li style="margin-bottom: 0;">SELECT（該当なしになることを確認）</li>
+		</ol>
+		<details style="margin-top: 8px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #555;">ヒント</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;"><code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">EmpDao</code> の各メソッドは接続を都度取るため、この課題では <strong>Connection を1つ開いたまま</strong> <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">prepareStatement</code> を繰り返す実装にする。参考実装: <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">Unit04_DAO_Update/src/TransactionSample.java</code>（<code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id = 99</code>）。</p>
+			</div>
+		</details>
+		<details style="margin-top: 5px;">
+			<summary style="cursor: pointer; font-weight: bold; color: #0033ff;">解答の参照先</summary>
+			<div style="margin: 10px 0; padding: 10px 15px; background-color: #fff; border-radius: 5px; border: 1px solid #e1dbbd;">
+				<p style="margin: 0;">リポジトリの <strong>Unit04_DAO_Update/src/TransactionSample.java</strong> をそのまま読み、自分の <code style="font-family: monospace; background-color: #f5f5f5; padding: 1px 4px; border-radius: 3px;">emp_id</code> に書き換えて実行してよい。</p>
+			</div>
+		</details>
+	</section>
+</div>

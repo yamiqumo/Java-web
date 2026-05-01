@@ -10,33 +10,36 @@
 
 ## 講義日程（2026）
 
-- **オンライン講義**: 毎週火曜日 3時間（3/25 〜 5/26）※3/17 は MySQL / Workbench 環境構築
+- **オンライン講義**: 毎週火曜日 3時間（3/25 〜 6/02）※3/17 は MySQL / Workbench 環境構築
 - **実地講義（対面）**: 4/26(日)、5/31(日)
 - **GW休み**: 5/5
+
+第4回を **DAO（更新系）** にし、従来の **復習日** を第5回へ繰り下げたため、第6回以降の単元が1段ずつ後ろにずれ、**MVC完成**は **第11回（6/02）** とする。
 
 | 回数 | 日付 | 形式 | 単元テーマ | 5分間プレゼンのお題 | ページ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | 第1回 | 3/25 | Online | SQL基礎（SELECT/INSERT） | SQLのクエリ発行とデータの旅 | [unit01](units/unit01.md) |
 | 第2回 | 4/01 | Online | JDBC接続の基本 | JDBCの4ステップ・パイプライン | [unit02](units/unit02.md) |
-| 第3回 | 4/08 | Online | DAOパターンと安全性 | DAO分離とプリペアドステートメント | [unit03](units/unit03.md) |
-| 第4回 | 4/15 | Online | 【復習日】コード徹底修正 | ここまでのデータフロー総括 | [unit04](units/unit04.md) |
-| 第5回 | 4/22 | Online | Web基本構造 & Tomcat | Webの循環とTomcatの内部構造 | [unit05](../_Doc/unit05.md) |
-| 第6回 | 4/29 | Online | Servlet（司令塔）の仕組み | Servletの司令塔メカニズム | [unit06](units/unit06.md) |
+| 第3回 | 4/08 | Online | DAO（参照系）と安全性 | DAO分離とプリペアドステートメント | [unit03](units/unit03.md) |
+| 第4回 | 4/15 | Online | DAO（更新系）とトランザクション | 更新系SQLと commit / rollback | [unit04](units/unit04.md) |
+| 第5回 | 4/22 | Online | 【復習日】コード徹底修正 | ここまでのデータフロー総括 | [unit05-review](units/unit05-review.md) |
+| 第6回 | 4/29 | Online | Web基本構造 & Tomcat | Webの循環とTomcatの内部構造 | [unit05](../_Doc/unit05.md) |
 | SP1 | 4/26(日) | 実習 | 【実地①】DB×Web疎通キャンプ | （対面ハンズオン） | [sp01](units/sp01.md) |
-| 第7回 | 5/06 | Online | Session管理 & Server復習 | クッキーとセッションの連携 | [unit07](units/unit07.md) |
+| 第7回 | 5/06 | Online | Servlet（司令塔）の仕組み | Servletの司令塔メカニズム | [unit06](units/unit06.md) |
 | — | 5/05 | OFF | ゴールデンウィーク休講 | — | — |
-| 第8回 | 5/12 | Online | JSP & JavaBeans | JSPの正体とJavaBeansのルール | [unit08](units/unit08.md) |
-| 第9回 | 5/19 | Online | 【特訓】ひたすら問題演習 | JSP終了時点の全知識解説 | [unit09](units/unit09.md) |
-| 第10回 | 5/26 | Online | MVC完成 & 4つのスコープ | MVCの三角形と「データの旅」 | [unit10](units/unit10.md) |
+| 第8回 | 5/12 | Online | Session管理 & Server復習 | クッキーとセッションの連携 | [unit07](units/unit07.md) |
+| 第9回 | 5/19 | Online | JSP & JavaBeans | JSPの正体とJavaBeansのルール | [unit08](units/unit08.md) |
+| 第10回 | 5/26 | Online | 【特訓】ひたすら問題演習 | JSP終了時点の全知識解説 | [unit09](units/unit09.md) |
+| 第11回 | 6/02 | Online | MVC完成 & 4つのスコープ | MVCの三角形と「データの旅」 | [unit10](units/unit10.md) |
 | SP2 | 5/31(日) | 実習 | 【実地②】MVC最終演習 & 発表会 | 設計図（Blueprint）の再現 | [sp02](units/sp02.md) |
 
-### オプション講座（正課外・DAO前推奨）
+### 例外処理（第3回DAO直前・強く推奨）
 
-第3回（DAO）の直前に、**30分〜1時間**で例外の基礎〜 try-with-resources までをまとめる任意枠。受講しなくても第3回に進められるが、JDBC の `catch` 理解が楽になる。
+第3回（DAO・参照系）の直前に、**30分〜1時間**で例外の基礎〜 try-with-resources までをまとめる。**正課の流れでは先に扱う想定**とし、未実施でも演習は進められるが、JDBC の `SQLException` や `rollback` の理解が楽になる。
 
 | 名称 | 目安時間 | タイミング | ページ |
 | :--- | :--- | :--- | :--- |
-| Java 例外処理オプション | 30分〜1時間 | 第3回（4/8）直前・日程は別途 | [optional-exception-handling](units/optional-exception-handling.md) |
+| Java 例外処理 | 30分〜1時間 | 第3回（4/8）直前 | [optional-exception-handling](units/optional-exception-handling.md)（教材: `Unit90_Exception`） |
 
 ---
 
@@ -63,4 +66,3 @@
 
 - 「最後の図」が誤っていても、この講座では **正しいI/O（データの旅）** を基準にする。
 - 参照: [architecture](architecture.md)
-
